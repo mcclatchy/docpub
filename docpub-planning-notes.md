@@ -15,7 +15,9 @@
 * title
 * description
 * source (don't include if it's leaked/confidential)
-* file upload
+* file upload 
+	* do we even need to store the PDF or can we just stream it?
+	* if it needs to be stored, then probably best to delete after uploaded to avoid huge storage costs
 * or link to PDF
 
 ***publishing info***
