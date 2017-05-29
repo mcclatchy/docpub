@@ -23,7 +23,7 @@ Create an environment
 
 Add this to your `bash_profile` (e.g. Mac) or `bash_rc` (e.g. Linux)
 
-	alias='workon docpub && cd ~/path/to/code' 
+	alias='workon docpub && cd ~/path/to/docpub/docpub' 
 
 ## Requirements
 
@@ -31,6 +31,16 @@ Install the requirements
 
 	pip install -r requirements.txt
 
+## Private settings
+
+Create a private settings file
+
+	vim ~/path/to/docpub/docpub/settings_private.py
+
+Add your secret key
+
+	SECRET_KEY = ''
+w
 # Dev work
 
 ## Local server
@@ -47,4 +57,5 @@ If you want to run it on a different port, you can specify the port
 Open your browser and ensure you can see a Django page
 
 	http://127.0.0.1:8100/
+
 
