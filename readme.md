@@ -40,7 +40,7 @@ Create a private settings file
 Add your secret key
 
 	SECRET_KEY = ''
-w
+
 # Dev work
 
 ## Local server
