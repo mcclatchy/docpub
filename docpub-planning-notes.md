@@ -15,6 +15,7 @@
 * title
 * description
 * source (don't include if it's leaked/confidential)
+* secure?
 * file upload 
 	* do we even need to store the PDF or can we just stream it?
 	* if it needs to be stored, then probably best to delete after uploaded to avoid huge storage costs
@@ -30,12 +31,25 @@
 * embed code
 
 *EMBED CODE*
-* minify it? yes, less likely for incomplete or error in copy-paste
 * one-click button to copy and/or click within the field to select-all automatically
+	* https://codepen.io/shaikmaqsood/pen/XmydxJ/
+* how to handle for mobile apps?
+	* generate iframe?
+	* link directly to doc viewer?
+	* PDF icon to open in-app browser?
 
 *NOTES*
+* workflow
+	* add / edit
+	* view form
+	* submit + get embed code
 * drag-and-drop interface for the form? initially it will just be a standard "click and choose"
 	* try jQuery File Upload; basic seems best https://blueimp.github.io/jQuery-File-Upload/basic.html
 	* also check out this Django implementation https://github.com/sigurdga/django-jquery-file-upload
 * use Google oauth for login?
+* use Google Drive or Issuu for first pass?
+	* https://developers.google.com/drive/v3/web/quickstart/python
+	* https://developers.issuu.com/
+	* https://www.scribd.com/developers (no longer accepting new registrations)
 * create bookmarklet that can grab a PDF open in your browser?
+* ablity to convert word doc to PDF during file upload?
