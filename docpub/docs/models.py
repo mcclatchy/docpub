@@ -5,14 +5,7 @@ from django.utils.html import format_html
 from django.contrib import messages
 
 
-class BasicInfo(models.Model):
-    created = models.DateTimeField(null=True, blank=True, auto_now_add=True, help_text="When the item was first created.")
-    updated = models.DateTimeField(blank=True, null=True, auto_now=True, help_text="When the item was last updated.")
-
-    class Meta:
-        abstract = True
-
-
+##### DOCUMNET METHODS #####
 def build_project_list():
     ''' dynamically creates a choices list of two-tuples based on the
     DocumentCloud projects for this account. '''
@@ -27,6 +20,7 @@ def document_update(self):
     obj = self.document_cloud_object()
     for key, value in self.document_cloud_fields.items():
         setattr(obj, key, value)
+    # self.documentcloud_url = obj.canonical_url
     obj.save()
 
 # add info to documentcloud.org on create
@@ -68,11 +62,20 @@ def generate_embed(self):
         )
 
 
+##### MODELS #####
+class BasicInfo(models.Model):
+    created = models.DateTimeField(null=True, blank=True, auto_now_add=True, help_text="When the item was first created.")
+    updated = models.DateTimeField(blank=True, null=True, auto_now=True, help_text="When the item was last updated.")
+
+    class Meta:
+        abstract = True
+
+
 class Document(BasicInfo):
     access = models.CharField(max_length=255, null=True, choices=ACCESS_CHOICES, help_text='Should the document be visible publicly or only to other users in your DocumentCloud organization.')
     description = models.TextField(blank=True, null=True, help_text='Optional (but strongly encouraged) description of the document.')
     documentcloud_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud ID', help_text='ID of the document on DocumentCloud')
-    documentcloud_url = models.URLField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud URL', help_text='URL of the document on DocumentCloud')
+    documentcloud_url = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud URL', help_text='URL of the document on DocumentCloud')
     embed_code = models.TextField(null=True, blank=True, help_text='Copy the full piece of code above.')
     file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to='uploads/pdf/') ## date: (upload_to='uploads/%Y/%m/%d/')
     link = models.URLField(max_length=255, null=True, blank=True, verbose_name='Link to PDF', help_text='...paste the URL of a PDF you would like to upload.')
@@ -85,11 +88,9 @@ class Document(BasicInfo):
     sidebar = models.BooleanField(blank=True, default=False, verbose_name='Enable document viewer sidebar?', help_text='Not recommended for article page embeds.')
     source = models.CharField(max_length=255, blank=True, null=True, verbose_name='Source name', help_text='What organization, person, etc. created this document? Optional, but strongly encouraged if not a senstive/confidential.')
 
-    # def format_embed_code(self):
-    #     return format_html('{}'.format(self.embed_code))
-
-    def document_admin_url(self):
-        return format_html('<a href="{}">View on Document Cloud</a>'.format(self.documentcloud_url))
+    def documentcloud_url_formatted(self):
+        return format_html('<a href="{}">View document</a>'.format(self.documentcloud_url))
+    documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
     def get_project_object(self):
         project = client.projects.get_by_title(self.project)
