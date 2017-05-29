@@ -15,8 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+# from docpub.settings import DEBUG as debug
 
 urlpatterns = [
     url(r'^docs/', include('docs.urls')),
     url(r'^admin/', admin.site.urls),
 ]
+
+# if debug:
+#     import debug_toolbar
+#     urlpatterns = [
+#         url(r'^__debug__/', include(debug_toolbar.urls)),
+#     ] + urlpatterns
