@@ -5,3 +5,4 @@
 settings_private*
 static/
 migrations/
+uploads/
