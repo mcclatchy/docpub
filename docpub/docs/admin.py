@@ -3,10 +3,10 @@ from .models import Document
 
 
 class DocumentAdmin(admin.ModelAdmin):
-    fields = ('documentcloud_id', 'title', ('file', 'link',), 'description', 'source', 'access', 'project', 'embed_code') # 'format_embed_code'
-    list_display = ('title', 'source', 'access', 'project','document_admin_url') ## copy_embed_code
+    fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
+    list_display = ('title', 'source', 'access', 'project', 'documentcloud_url_formatted') ## copy_embed_code
     list_filter = ('access', 'project')
-    readonly_fields = ('embed_code', 'documentcloud_id',)
+    readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id'
     actions = ('generate_embed_codes')
 
     ## add admin action to generate document embed code list for user

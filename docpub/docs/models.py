@@ -93,8 +93,9 @@ class Document(BasicInfo):
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
     def get_project_object(self):
-        project = client.projects.get_by_title(self.project)
-        return str(project.id)
+        if self.project:
+            project = client.projects.get_by_title(self.project)
+            return str(project.id)
 
     def document_cloud_object(self):
         return client.documents.get(self.documentcloud_id)
