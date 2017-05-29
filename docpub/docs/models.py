@@ -58,11 +58,14 @@ def generate_embed(self):
     doc_id_number = doc_id.split('-')[0]
     doc_title_hyphenated = doc_title.replace(' ', '-')
     doc_sidebar = str(self.sidebar).lower()
-    # self.embed_code = '<div id="DV-viewer-' + doc_id + '" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>DV.load("https://www.documentcloud.org/documents/' + doc_id + '.js", {responsive: true, sidebar: ' + str(self.sidebar).lower() + ', container: "#DV-viewer-' + doc_id + '"});</script><noscript><a href="https://assets.documentcloud.org/documents/' + doc_id_number + '/' + doc_title_hyphenated + '.pdf">' + doc_title + ' (PDF)</a><br /><a href="https://assets.documentcloud.org/documents/' + doc_id_number + '/' + doc_title_hyphenated + '.txt">' + doc_title + ' (Text)</a></noscript>'
-    # self.embed_code = self.documentcloud_url
-    self.embed_code = '<div id="DV-viewer-{id}" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>DV.load("https://www.documentcloud.org/documents/{id}.js", {{responsive: true, sidebar: {sidebar}, container: "#DV-viewer-{id}"}});</script><noscript><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.pdf">{title} (PDF)</a><br /><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.txt">{title} (Text)</a></noscript>'.format(id=doc_id, title=doc_title, id_number=doc_id_number, title_hyphenated=doc_title_hyphenated, sidebar=doc_sidebar)
-    ## example original
-    # self.embed_code = '<div id="DV-viewer-3497784-American-Health-Care-Act" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>  DV.load("https://www.documentcloud.org/documents/3497784-American-Health-Care-Act.js", {  responsive: true,    sidebar: false,    container: "#DV-viewer-3497784-American-Health-Care-Act"  });</script><noscript>  <a href="https://assets.documentcloud.org/documents/3497784/American-Health-Care-Act.pdf">American Health Care Act (PDF)</a>  <br />  <a href="https://assets.documentcloud.org/documents/3497784/American-Health-Care-Act.txt">American Health Care Act (Text)</a></noscript>'
+
+    self.embed_code = '<div id="DV-viewer-{id}" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>DV.load("https://www.documentcloud.org/documents/{id}.js", {{responsive: true, sidebar: {sidebar}, container: "#DV-viewer-{id}"}});</script><noscript><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.pdf">{title} (PDF)</a><br /><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.txt">{title} (Text)</a></noscript>'.format(
+            id=doc_id, 
+            title=doc_title, 
+            id_number=doc_id_number, 
+            title_hyphenated=doc_title_hyphenated, 
+            sidebar=doc_sidebar
+        )
 
 
 class Document(BasicInfo):
