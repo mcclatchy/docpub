@@ -4,8 +4,8 @@ from .models import Document
 
 class DocumentAdmin(admin.ModelAdmin):
     fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
-    list_display = ('title', 'source', 'access', 'project', 'documentcloud_url_formatted') ## copy_embed_code
-    list_filter = ('access', 'project')
+    list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted') ## copy_embed_code
+    list_filter = ('access', 'project') # 'updated', 'created', 
     readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id'
     actions = ('generate_embed_codes')
 
