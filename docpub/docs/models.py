@@ -89,7 +89,10 @@ class Document(BasicInfo):
     source = models.CharField(max_length=255, blank=True, null=True, verbose_name='Source name', help_text='What organization, person, etc. created this document? Optional, but strongly encouraged if not a senstive/confidential.')
 
     def documentcloud_url_formatted(self):
-        return format_html('<a href="{}">View document</a>'.format(self.documentcloud_url))
+        link = '-'
+        if self.documentcloud_id:
+            link = format_html('<a href="{}">View on DocumentCloud</a>'.format(self.documentcloud_url))
+        return link
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
     def get_project_object(self):
