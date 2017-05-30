@@ -47,6 +47,9 @@
 	* try jQuery File Upload; basic seems best https://blueimp.github.io/jQuery-File-Upload/basic.html
 	* also check out this Django implementation https://github.com/sigurdga/django-jquery-file-upload
 * use Google oauth for login?
+	* https://developers.google.com/api-client-library/python/start/get_started
+	* https://developers.google.com/api-client-library/python/guide/django
+	* https://artandlogic.com/2014/04/tutorial-adding-facebooktwittergoogle-authentication-to-a-django-application/
 * use Google Drive or Issuu for first pass?
 	* https://developers.google.com/drive/v3/web/quickstart/python
 	* https://developers.issuu.com/
