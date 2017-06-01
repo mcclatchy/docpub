@@ -1,8 +1,9 @@
 from django.db import models
 from docs.connection import client
 from docs.choices import ACCESS_CHOICES
+from docpub.settings import DOMAIN, UPLOAD_PATH
 from django.utils.html import format_html
-from django.contrib import messages
+from django.contrib.auth.models import User
 
 
 ##### DOCUMNET METHODS #####
@@ -25,13 +26,12 @@ def document_update(self):
 
 # add info to documentcloud.org on create
 def document_upload(self):
-    try:
-        if self.file:
-            pdf = self.file
-        elif self.link:
+    if self.file or self.link:
+        if self.link:
             pdf = self.link
-    except:
-        messages.error(request, 'You must upload a file or include a URL to a PDF')
+        elif self.file:
+            pdf = self.file
+
     kwargs = {
         'title': self.title,
         'source': self.source,
@@ -72,15 +72,18 @@ class BasicInfo(models.Model):
 
 
 class Document(BasicInfo):
-    access = models.CharField(max_length=255, null=True, choices=ACCESS_CHOICES, help_text='Should the document be visible publicly or only to other users in your DocumentCloud organization.')
+    access = models.CharField(max_length=255, null=True, choices=ACCESS_CHOICES, verbose_name='Who can see this?', help_text='Should the document be publicly visible or only visible to other users in your DocumentCloud organization?')
     description = models.TextField(blank=True, null=True, help_text='Optional (but strongly encouraged) description of the document.')
     documentcloud_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud ID', help_text='ID of the document on DocumentCloud')
     documentcloud_url = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud URL', help_text='URL of the document on DocumentCloud')
     embed_code = models.TextField(null=True, blank=True, help_text='Copy the full piece of code above.')
-    file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to='uploads/pdf/') ## date: (upload_to='uploads/%Y/%m/%d/')
-    link = models.URLField(max_length=255, null=True, blank=True, verbose_name='Link to PDF', help_text='...paste the URL of a PDF you would like to upload.')
+    file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to=UPLOAD_PATH) ## date: (upload_to='uploads/%Y/%m/%d/') ## this path works for uploading, but not when click in admin afterward
+    link = models.URLField(max_length=255, null=True, blank=True, verbose_name='Link to PDF', help_text='...paste the URL of a PDF you would like to upload. \
+        <br><strong>*** NOTES ***</strong><br> \
+        - You can only use one PDF option (upload or link)<br> \
+        - The PDF cannot be changed or updated after you hit save for the first time &mdash; no matter which way you add it.')
     messy_text = models.BooleanField(default=False, help_text='Check this box if the "Plain text" is too messy to include or clean up manually. A link to the PDF will be displayed on mobile with no plain text version.')
-    project = models.CharField(max_length=255, null=True, blank=True, choices=build_project_list(), help_text='Cannot be updated from here after initially set -- must be changed in DocumentCloud.') ## UPDATE: remove blank=True to make required
+    project = models.CharField(max_length=255, null=True, blank=True, choices=build_project_list(), help_text='Optional, but helpful. Cannot be updated from here after initially set -- must be changed in DocumentCloud.') ## UPDATE: remove blank=True to make required?
     text = models.TextField(null=True, blank=True, verbose_name='Document text', help_text='Text of the PDF extracted by DocumentCloud. Leave this blank when you first upload the document. It will be filled in automatically. If the plain text does not appear after initially creating/saving here, check on DocumentCloud.org to see if the document is finished processing. When it is done, come back here and click "Save and continue editing" below, then verify the text is filled in here. If you would like, you can clean up the text as needed after it appears here. At any point in the process, the plain text will not be overwritten if there is any text here -- original or modified.')
     title = models.CharField(max_length=255, blank=False, null=True, help_text='Short yet descriptive title (e.g. 2017 House budget proposal).')
     related_article = models.URLField(max_length=255, blank=True, null=True, help_text='Optional link to the story this document relates to.')
