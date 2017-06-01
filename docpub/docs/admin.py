@@ -1,4 +1,5 @@
 from django.contrib import admin
+# from django.contrib import messages
 from .models import Document
 
 
@@ -8,6 +9,11 @@ class DocumentAdmin(admin.ModelAdmin):
     list_filter = ('access', 'project') # 'updated', 'created', 
     readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id'
     actions = ('generate_embed_codes')
+
+    # def save_model(self, request, obj, form, change):
+    #     if not 'file' or 'link' in form.changed_data:
+    #         messages.add_message(request, messages.INFO, 'You must upload or link to a PDF')
+    #     # super(CarAdmin, self).save_model(request, obj, form, change)
 
     ## add admin action to generate document embed code list for user
     def generate_embed_codes(self, request, queryset):
