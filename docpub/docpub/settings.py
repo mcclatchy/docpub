@@ -27,6 +27,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 # INTERNAL_IPS = ['127.0.0.1']
 
+DOMAIN = os.path.join(BASE_DIR, '')
+UPLOAD_PATH = 'uploads/pdf/'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,7 +59,7 @@ ROOT_URLCONF = 'docpub.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
