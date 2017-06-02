@@ -1,6 +1,6 @@
 *FIELDS*
 
-***your info***
+***your info/usermodel***
 * name (only if they don't have an account; scratch this in favor of just email?) 
 	* pass along via key/value metadata feature?
 * email (whether they do or do not have an account)
@@ -11,34 +11,30 @@
 * newsroom (drop-down)
 	* pass in key-value pair
 
-***doc info***
-* title
-* description
-* source (don't include if it's leaked/confidential)
-* secure?
-* file upload 
-	* do we even need to store the PDF or can we just stream it?
-	* if it needs to be stored, then probably best to delete after uploaded to avoid huge storage costs
-* or link to PDF
-
 ***publishing info***
 * email me when finished
 * ??? related article URL 
 * ??? published URL
-* access level
 * schedule publish
-* link to document viewer
-* embed code
 
 *EMBED CODE*
 * one-click button to copy and/or click within the field to select-all automatically
 	* https://codepen.io/shaikmaqsood/pen/XmydxJ/
 * how to handle for mobile apps?
-	* generate iframe?
-	* link directly to doc viewer?
-	* PDF icon to open in-app browser?
+	* generate upload html file with embed code to S3 and provide iframe?
+	* pre-fix code to control display
+		* leave as is on desktop
+		* hide script embed and link directly to doc viewer on apps? check for jquery?
+	* generic PDF or `thumbnail_image_url` icon to open in-app browser?
+		* having issues with this; will we need to grab and host on S3?
 
 *NOTES*
+* for admin fields, note which are displayed publicly 
+* doccloud creds in django user; if not, then use master account 
+* file storage
+	* S3? https://github.com/bradleyg/django-s3direct
+	* do we even need to store the PDF or can we just stream it?
+	* if it needs to be stored, then probably best to delete after uploaded to avoid huge storage costs
 * workflow
 	* add / edit
 	* view form
