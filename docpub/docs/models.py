@@ -1,9 +1,11 @@
 from django.db import models
+from django.utils.html import format_html
+from django.contrib.auth.models import User
 from docs.connection import client
 from docs.choices import ACCESS_CHOICES
 from docpub.settings import DOMAIN, UPLOAD_PATH
-from django.utils.html import format_html
-from django.contrib.auth.models import User
+from docpub.settings_private import CDN_DOMAIN
+import boto3
 
 
 ##### DOCUMNET METHODS #####
@@ -18,8 +20,8 @@ def build_project_list():
 
 # update info on documentcloud.org on save
 def document_update(self):
-    obj = self.document_cloud_object()
-    for key, value in self.document_cloud_fields.items():
+    obj = self.documentcloud_object()
+    for key, value in self.documentcloud_fields.items():
         setattr(obj, key, value)
     # self.documentcloud_url = obj.canonical_url
     obj.save()
@@ -52,14 +54,28 @@ def generate_embed(self):
     doc_id_number = doc_id.split('-')[0]
     doc_title_hyphenated = doc_title.replace(' ', '-')
     doc_sidebar = str(self.sidebar).lower()
-
-    self.embed_code = '<div id="DV-viewer-{id}" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>DV.load("https://www.documentcloud.org/documents/{id}.js", {{responsive: true, sidebar: {sidebar}, container: "#DV-viewer-{id}"}});</script><noscript><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.pdf">{title} (PDF)</a><br /><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.txt">{title} (Text)</a></noscript>'.format(
+    doc_thumb = self.documentcloud_thumbnail
+    doc_pdf = self.documentcloud_pdf_url
+    ## styles for hiding Document Viewer on native apps and showing thumbnail
+    script = '<script>if (!window.jQuery){var embeds=document.getElementsByClassName("doccloud"); var thumbs=document.getElementsByClassName("docthumb"); for (var i=0;i<embeds.length;i++){embeds[i].style.display="none";} for (var i=0;i<thumbs.length;i++){thumbs[i].style.display="inline";}}</script>'
+    embed_prefix = '<style>#DV-viewer-{id} {{ display: inline; }} .docthumb {{ display: none; }}</style><div class="docthumb"><a href="{pdf}"><img src="{thumb}" width="100%" /></a></div>'.format(
+            id=doc_id,
+            pdf=doc_pdf,
+            thumb=doc_thumb
+        )
+    ## construct the DocumentCloud embed code wrapped in div we'll hide for apps
+    standard_embed = '<div class="doccloud"><div id="DV-viewer-{id}" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>DV.load("https://www.documentcloud.org/documents/{id}.js", {{responsive: true, sidebar: {sidebar}, container: "#DV-viewer-{id}"}});</script></div><noscript><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.pdf">{title} (PDF)</a><br /><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.txt">{title} (Text)</a></noscript>'.format(
             id=doc_id, 
             title=doc_title, 
             id_number=doc_id_number, 
             title_hyphenated=doc_title_hyphenated, 
             sidebar=doc_sidebar
         )
+
+    self.embed_code = script + embed_prefix + standard_embed
+
+def delete_file(self):
+    os.remove(self.file.path)
 
 
 ##### MODELS #####
@@ -75,6 +91,8 @@ class Document(BasicInfo):
     access = models.CharField(max_length=255, null=True, choices=ACCESS_CHOICES, verbose_name='Who can see this?', help_text='Should the document be publicly visible or only visible to other users in your DocumentCloud organization?')
     description = models.TextField(blank=True, null=True, help_text='Optional (but strongly encouraged) description of the document.')
     documentcloud_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud ID', help_text='ID of the document on DocumentCloud')
+    documentcloud_pdf_url = models.URLField(max_length=255, blank=True, null=True, verbose_name='PDF hosted by DocumentCloud', help_text='Automatically pulled from DocumentCloud after document finishes processing.')
+    documentcloud_thumbnail = models.URLField(max_length=255, blank=True, null=True, verbose_name='Document thumbail', help_text='Pulled from DocumentCloud after document finishes processing.')
     documentcloud_url = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud URL', help_text='URL of the document on DocumentCloud')
     embed_code = models.TextField(null=True, blank=True, help_text='Copy the full piece of code above.')
     file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to=UPLOAD_PATH) ## date: (upload_to='uploads/%Y/%m/%d/') ## this path works for uploading, but not when click in admin afterward
@@ -103,12 +121,13 @@ class Document(BasicInfo):
             project = client.projects.get_by_title(self.project)
             return str(project.id)
 
-    def document_cloud_object(self):
-        return client.documents.get(self.documentcloud_id)
+    def documentcloud_object(self):
+        if self.documentcloud_id:
+            return client.documents.get(self.documentcloud_id)
 
     # map django model fields to documentcloud.org fields
     @property
-    def document_cloud_fields(self):
+    def documentcloud_fields(self):
         return {
             'title': self.title,
             'source': self.source,
@@ -123,6 +142,24 @@ class Document(BasicInfo):
     # def copy_embed_code(self):
         # or put this in admin.py?
 
+    def image_to_s3(self):
+        obj = documentcloud_object(self)
+        img = obj.large_image_url # small_image_url # thumbail_image_url
+        ## set s3 filename
+        filename_s3 = 'documents/images/{}.json'.format(self.documentcloud_id)
+        ## connect to S3
+        s3 = boto3.resource('s3')
+        ## upload the image
+        data = open('test.jpg', 'rb')
+        s3.Bucket('mccdata').put_object(Key=img, Body=data)
+        # s3.Object('mccdata', filename_s3).put(Body=json_string)
+        ## cdn domain for file url
+        domain = CDN_DOMAIN
+        ## url of the uploaded file
+        url = domain + '/' + filename_s3
+        self.documentcloud_thumbnail = url
+
+
     def save(self, *args, **kwargs):
         if self.updated:
             document_update(self)
@@ -130,9 +167,16 @@ class Document(BasicInfo):
             document_upload(self)
         ## abstract to get_doc_id() function?
         # self.documentcloud_id = obj.id
-        if self.documentcloud_id:
+        if documentcloud_object(self):
+            obj = documentcloud_object(self)
+            # self.documentcloud_thumbnail = obj.large_image_url ## pull from mccdata-hosted?
+            self.documentcloud_pdf_url = obj.pdf_url
+            ## upload image to s3
+            image_to_s3(self)
+            ## generate the embed
             generate_embed(self)
         return super(Document, self).save(*args, **kwargs)
+        ## if we're going to use delete_file(self), include here and then do another return super to save?
 
     class Meta:
         ordering = ['-created'] # updated might get confusing, but could be more helpful
@@ -145,3 +189,7 @@ class Document(BasicInfo):
     # while obj.access != 'public':
     #     time.sleep(5)
     #     obj = client.documents.get(obj.id)
+    ## we'd also want to grab doc text and thumbnail
+    # obj.full_text
+    # obj.thumbnail_image_url
+    # obj.pdf_url
