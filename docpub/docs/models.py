@@ -92,7 +92,7 @@ def generate_embed(self):
 
     # self.embed_code = script + embed_prefix + standard_embed
     self.embed_code = iframe_embed
-    
+
 
 ##### MODELS #####
 class BasicInfo(models.Model):
@@ -168,9 +168,9 @@ class Document(BasicInfo):
         if documentcloud_object(self):
             obj = documentcloud_object(self)
             self.documentcloud_pdf_url = obj.pdf_url
-            self.text = obj.full_text
-            ## upload image to s3
-            # image_to_s3(self)
+            ## grab the text unless messy text is selected
+            # if not self.messy_text:
+            #     self.text = obj.full_text
             ## generate the embed
             generate_embed(self)
         return super(Document, self).save(*args, **kwargs)
@@ -189,5 +189,4 @@ class Document(BasicInfo):
     #     obj = client.documents.get(obj.id)
     ## we'd also want to grab doc text and thumbnail
     # obj.full_text
-    # obj.thumbnail_image_url
     # obj.pdf_url
