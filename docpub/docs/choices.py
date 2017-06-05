@@ -4,5 +4,5 @@
 ACCESS_CHOICES = (
     #('private', 'Private (only viewable by those with permission to this doc)'),
     ('public', 'Public'),
-    ('organization', 'Only within your organization')
+    ('organization', 'Your newsroom')
 )
