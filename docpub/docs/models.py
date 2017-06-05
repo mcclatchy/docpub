@@ -5,7 +5,7 @@ from docs.connection import client
 from docs.choices import ACCESS_CHOICES
 from docpub.settings import DOMAIN, UPLOAD_PATH
 from docpub.settings_private import CDN_DOMAIN
-import boto3
+# import boto3
 
 
 ##### DOCUMNET METHODS #####
@@ -17,6 +17,15 @@ def build_project_list():
         project_tuple = (project.title, project.title)
         projects_list.append(project_tuple)
     return projects_list
+
+## deletes PDF on file system
+def delete_file(self):
+    os.remove(self.file.path)
+
+## get a specific document object on DocumentCloud
+def documentcloud_object(self):
+    if self.documentcloud_id:
+        return client.documents.get(self.documentcloud_id)
 
 # update info on documentcloud.org on save
 def document_update(self):
@@ -55,6 +64,8 @@ def generate_embed(self):
     doc_title_hyphenated = doc_title.replace(' ', '-')
     doc_sidebar = str(self.sidebar).lower()
     doc_thumb = self.documentcloud_thumbnail
+    if not doc_thumb:
+        doc_thumb = ''
     doc_pdf = self.documentcloud_pdf_url
     ## styles for hiding Document Viewer on native apps and showing thumbnail
     script = '<script>if (!window.jQuery){var embeds=document.getElementsByClassName("doccloud"); var thumbs=document.getElementsByClassName("docthumb"); for (var i=0;i<embeds.length;i++){embeds[i].style.display="none";} for (var i=0;i<thumbs.length;i++){thumbs[i].style.display="inline";}}</script>'
@@ -74,8 +85,23 @@ def generate_embed(self):
 
     self.embed_code = script + embed_prefix + standard_embed
 
-def delete_file(self):
-    os.remove(self.file.path)
+
+def image_to_s3(self):
+    obj = documentcloud_object(self)
+    img = obj.large_image_url # small_image_url # thumbail_image_url
+    ## set s3 filename
+    filename_s3 = 'documents/images/{}.json'.format(self.documentcloud_id)
+    ## connect to S3
+    s3 = boto3.resource('s3')
+    ## upload the image
+    data = open('test.jpg', 'rb')
+    s3.Bucket('mccdata').put_object(Key=img, Body=data)
+    # s3.Object('mccdata', filename_s3).put(Body=json_string)
+    ## cdn domain for file url
+    domain = CDN_DOMAIN
+    ## url of the uploaded file
+    url = domain + '/' + filename_s3
+    self.documentcloud_thumbnail = url
 
 
 ##### MODELS #####
@@ -112,18 +138,19 @@ class Document(BasicInfo):
     def documentcloud_url_formatted(self):
         link = '-'
         if self.documentcloud_id:
-            link = format_html('<a href="{}">View on DocumentCloud</a>'.format(self.documentcloud_url))
+            link = format_html('<a href="{}">View/edit on DocumentCloud</a>'.format(self.documentcloud_url))
         return link
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
+
+    ## get a specific document object on DocumentCloud
+    def documentcloud_object(self):
+        if self.documentcloud_id:
+            return client.documents.get(self.documentcloud_id)
 
     def get_project_object(self):
         if self.project:
             project = client.projects.get_by_title(self.project)
             return str(project.id)
-
-    def documentcloud_object(self):
-        if self.documentcloud_id:
-            return client.documents.get(self.documentcloud_id)
 
     # map django model fields to documentcloud.org fields
     @property
@@ -142,37 +169,19 @@ class Document(BasicInfo):
     # def copy_embed_code(self):
         # or put this in admin.py?
 
-    def image_to_s3(self):
-        obj = documentcloud_object(self)
-        img = obj.large_image_url # small_image_url # thumbail_image_url
-        ## set s3 filename
-        filename_s3 = 'documents/images/{}.json'.format(self.documentcloud_id)
-        ## connect to S3
-        s3 = boto3.resource('s3')
-        ## upload the image
-        data = open('test.jpg', 'rb')
-        s3.Bucket('mccdata').put_object(Key=img, Body=data)
-        # s3.Object('mccdata', filename_s3).put(Body=json_string)
-        ## cdn domain for file url
-        domain = CDN_DOMAIN
-        ## url of the uploaded file
-        url = domain + '/' + filename_s3
-        self.documentcloud_thumbnail = url
-
-
     def save(self, *args, **kwargs):
         if self.updated:
             document_update(self)
         else:
             document_upload(self)
-        ## abstract to get_doc_id() function?
-        # self.documentcloud_id = obj.id
+        ## abstract to get_doc_id() function or function with a while loop?
         if documentcloud_object(self):
             obj = documentcloud_object(self)
-            # self.documentcloud_thumbnail = obj.large_image_url ## pull from mccdata-hosted?
             self.documentcloud_pdf_url = obj.pdf_url
+            # self.text = obj.full_text
+            # self.documentcloud_thumbnail = obj.large_image_url ## pull from mccdata-hosted?
             ## upload image to s3
-            image_to_s3(self)
+            # image_to_s3(self) ## <--- UNCOMMENT WHEN READY
             ## generate the embed
             generate_embed(self)
         return super(Document, self).save(*args, **kwargs)
@@ -184,7 +193,7 @@ class Document(BasicInfo):
     def __str__(self):
         return self.title
 
-## post save? for text, etc -- anything else that wouldn't initially be available
+## in save method? post save? for text, etc -- anything else that wouldn't initially be available
     # obj = client.documents.get(obj.id)
     # while obj.access != 'public':
     #     time.sleep(5)
