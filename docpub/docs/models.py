@@ -92,26 +92,7 @@ def generate_embed(self):
 
     # self.embed_code = script + embed_prefix + standard_embed
     self.embed_code = iframe_embed
-
-# def image_to_s3(self):
-#     obj = documentcloud_object(self)
-#     response = requests.get(obj.large_image_url)
-#     img_url = response.url
-#     # img =  # small_image_url # thumbail_image_url
-#     ## set s3 filename
-#     filename_s3 = 'documents/images/{}.json'.format(self.documentcloud_id)
-#     ## connect to S3
-#     s3 = boto3.resource('s3')
-#     ## upload the image
-#     data = open(img_url, 'rb')
-#     s3.Bucket('mccdata').put_object(Key=obj.id, Body=data)
-#     # s3.Object('mccdata', filename_s3).put(Body=json_string)
-#     ## cdn domain for file url
-#     domain = CDN_DOMAIN
-#     ## url of the uploaded file
-#     url = domain + '/' + filename_s3
-#     self.documentcloud_thumbnail = url
-
+    
 
 ##### MODELS #####
 class BasicInfo(models.Model):
@@ -187,8 +168,7 @@ class Document(BasicInfo):
         if documentcloud_object(self):
             obj = documentcloud_object(self)
             self.documentcloud_pdf_url = obj.pdf_url
-            # self.text = obj.full_text
-            # self.documentcloud_thumbnail = obj.large_image_url ## pull from mccdata-hosted?
+            self.text = obj.full_text
             ## upload image to s3
             # image_to_s3(self)
             ## generate the embed
