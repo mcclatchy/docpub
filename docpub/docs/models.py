@@ -59,49 +59,58 @@ def document_upload(self):
 ## generate/update embed code
 def generate_embed(self):
     doc_id = self.documentcloud_id
-    doc_title = self.title
-    doc_id_number = doc_id.split('-')[0]
-    doc_title_hyphenated = doc_title.replace(' ', '-')
+    # doc_title = self.title
+    # doc_id_number = doc_id.split('-')[0]
+    # doc_title_hyphenated = doc_title.replace(' ', '-')
     doc_sidebar = str(self.sidebar).lower()
-    doc_thumb = self.documentcloud_thumbnail
-    if not doc_thumb:
-        doc_thumb = ''
-    doc_pdf = self.documentcloud_pdf_url
+    # doc_thumb = self.documentcloud_thumbnail
+    # if not doc_thumb:
+        # doc_thumb = ''
+    # doc_pdf = self.documentcloud_pdf_url
     ## styles for hiding Document Viewer on native apps and showing thumbnail
-    script = '<script>if (!window.jQuery){var embeds=document.getElementsByClassName("doccloud"); var thumbs=document.getElementsByClassName("docthumb"); for (var i=0;i<embeds.length;i++){embeds[i].style.display="none";} for (var i=0;i<thumbs.length;i++){thumbs[i].style.display="inline";}}</script>'
-    embed_prefix = '<style>#DV-viewer-{id} {{ display: inline; }} .docthumb {{ display: none; }}</style><div class="docthumb"><a href="{pdf}"><img src="{thumb}" width="100%" /></a></div>'.format(
-            id=doc_id,
-            pdf=doc_pdf,
-            thumb=doc_thumb
-        )
+    # script = '<script>if (!window.jQuery){var embeds=document.getElementsByClassName("doccloud"); var thumbs=document.getElementsByClassName("docthumb"); for (var i=0;i<embeds.length;i++){embeds[i].style.display="none";} for (var i=0;i<thumbs.length;i++){thumbs[i].style.display="inline";}}</script>'
+    # embed_prefix = '<style>#DV-viewer-{id} {{ display: inline; }} .docthumb {{ display: none; }}</style><div class="docthumb"><a href="{pdf}"><img src="{thumb}" width="100%" /></a></div>'.format(
+        #     id=doc_id,
+        #     pdf=doc_pdf,
+        #     thumb=doc_thumb
+        # )
     ## construct the DocumentCloud embed code wrapped in div we'll hide for apps
-    standard_embed = '<div class="doccloud"><div id="DV-viewer-{id}" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>DV.load("https://www.documentcloud.org/documents/{id}.js", {{responsive: true, sidebar: {sidebar}, container: "#DV-viewer-{id}"}});</script></div><noscript><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.pdf">{title} (PDF)</a><br /><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.txt">{title} (Text)</a></noscript>'.format(
-            id=doc_id, 
-            title=doc_title, 
-            id_number=doc_id_number, 
-            title_hyphenated=doc_title_hyphenated, 
+    # standard_embed = '<div class="doccloud"><div id="DV-viewer-{id}" class="DC-embed DC-embed-document DV-container"></div><script src="//assets.documentcloud.org/viewer/loader.js"></script><script>DV.load("https://www.documentcloud.org/documents/{id}.js", {{responsive: true, sidebar: {sidebar}, container: "#DV-viewer-{id}"}});</script></div><noscript><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.pdf">{title} (PDF)</a><br /><a href="https://assets.documentcloud.org/documents/{id_number}/{title_hyphenated}.txt">{title} (Text)</a></noscript>'.format(
+    #         id=doc_id,
+    #         title=doc_title,
+    #         id_number=doc_id_number, 
+    #         title_hyphenated=doc_title_hyphenated, 
+    #         sidebar=doc_sidebar
+    #     )
+    iframe_embed = '<div><iframe src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}" style="border:none;width:100%;height:500px"></iframe></div>'.format(
+            id=doc_id,
             sidebar=doc_sidebar
-        )
+            # title=doc_title, 
+            # id_number=doc_id_number, 
+            # title_hyphenated=doc_title_hyphenated, 
+        ) # desktop height 930px, mobile height 500px
 
-    self.embed_code = script + embed_prefix + standard_embed
+    # self.embed_code = script + embed_prefix + standard_embed
+    self.embed_code = iframe_embed
 
-
-def image_to_s3(self):
-    obj = documentcloud_object(self)
-    img = obj.large_image_url # small_image_url # thumbail_image_url
-    ## set s3 filename
-    filename_s3 = 'documents/images/{}.json'.format(self.documentcloud_id)
-    ## connect to S3
-    s3 = boto3.resource('s3')
-    ## upload the image
-    data = open('test.jpg', 'rb')
-    s3.Bucket('mccdata').put_object(Key=img, Body=data)
-    # s3.Object('mccdata', filename_s3).put(Body=json_string)
-    ## cdn domain for file url
-    domain = CDN_DOMAIN
-    ## url of the uploaded file
-    url = domain + '/' + filename_s3
-    self.documentcloud_thumbnail = url
+# def image_to_s3(self):
+#     obj = documentcloud_object(self)
+#     response = requests.get(obj.large_image_url)
+#     img_url = response.url
+#     # img =  # small_image_url # thumbail_image_url
+#     ## set s3 filename
+#     filename_s3 = 'documents/images/{}.json'.format(self.documentcloud_id)
+#     ## connect to S3
+#     s3 = boto3.resource('s3')
+#     ## upload the image
+#     data = open(img_url, 'rb')
+#     s3.Bucket('mccdata').put_object(Key=obj.id, Body=data)
+#     # s3.Object('mccdata', filename_s3).put(Body=json_string)
+#     ## cdn domain for file url
+#     domain = CDN_DOMAIN
+#     ## url of the uploaded file
+#     url = domain + '/' + filename_s3
+#     self.documentcloud_thumbnail = url
 
 
 ##### MODELS #####
@@ -118,7 +127,7 @@ class Document(BasicInfo):
     description = models.TextField(blank=True, null=True, help_text='Optional (but strongly encouraged) description of the document.')
     documentcloud_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud ID', help_text='ID of the document on DocumentCloud')
     documentcloud_pdf_url = models.URLField(max_length=255, blank=True, null=True, verbose_name='PDF hosted by DocumentCloud', help_text='Automatically pulled from DocumentCloud after document finishes processing.')
-    documentcloud_thumbnail = models.URLField(max_length=255, blank=True, null=True, verbose_name='Document thumbail', help_text='Pulled from DocumentCloud after document finishes processing.')
+    # documentcloud_thumbnail = models.URLField(max_length=255, blank=True, null=True, verbose_name='Document thumbail', help_text='Pulled from DocumentCloud after document finishes processing.')
     documentcloud_url = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud URL', help_text='URL of the document on DocumentCloud')
     embed_code = models.TextField(null=True, blank=True, help_text='Copy the full piece of code above.')
     file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to=UPLOAD_PATH) ## date: (upload_to='uploads/%Y/%m/%d/') ## this path works for uploading, but not when click in admin afterward
@@ -181,7 +190,7 @@ class Document(BasicInfo):
             # self.text = obj.full_text
             # self.documentcloud_thumbnail = obj.large_image_url ## pull from mccdata-hosted?
             ## upload image to s3
-            # image_to_s3(self) ## <--- UNCOMMENT WHEN READY
+            # image_to_s3(self)
             ## generate the embed
             generate_embed(self)
         return super(Document, self).save(*args, **kwargs)
