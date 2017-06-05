@@ -29,6 +29,7 @@
 		* having issues with this; will we need to grab and host on S3?
 
 *NOTES*
+* why does documentcloud_object not work inside the Document class for upload and not outside for updating? right now it's duplicated, grrr...
 * for admin fields, note which are displayed publicly 
 * doccloud creds in django user; if not, then use master account 
 * file storage
