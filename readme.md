@@ -6,12 +6,15 @@
 * virtualenv
 * virtualenvwrapper
 * git
+* sqlite
 
 # Setup
 
 ## Local repo
 
-	git init docpub
+Clone the repo
+
+	git clone git@github.com:mcclatchy/docpub.git
 
 ## Virtualenv/virtualenvwrapper
 
@@ -37,9 +40,17 @@ Create a private settings file
 
 	vim ~/path/to/docpub/docpub/settings_private.py
 
-Add your secret key
+Add your Django secret key and DocumentCloud credentials
 
 	SECRET_KEY = ''
+	DC_USERNAME = ''
+	DC_PASSWORD = ''
+
+## Test/prod server
+
+Clone the repo
+
+	git clone git@github.com:mcclatchy/docpub.git
 
 # Dev work
 
@@ -58,4 +69,30 @@ Open your browser and ensure you can see a Django page
 
 	http://127.0.0.1:8100/
 
+## Test/production server
 
+Exit your virtualenv
+
+	deactivate
+
+Install necessary system packages
+
+	sudo apt-get install python3-dev
+	sudo -H pip3 install uwsgi
+
+Test uwsgi
+
+	uwsgi --http :8000 --home /home/ubuntEnvs/docpub/ --chdir /home/ubuntu/docpub/docpub/ -w docpub.wsgi
+
+Make directory for sites
+
+	sudo mkdir -p /etc/uwsgi/sites
+
+
+
+
+
+
+
+
+	
