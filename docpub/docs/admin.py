@@ -38,10 +38,14 @@ class DocumentAdmin(admin.ModelAdmin):
     ## save/upload the user and newsroom (should be PRE-SAVE?)
     def save_model(self, request, obj, form, change):
         user = request.user
+        fullname = user.get_full_name()
         email_address = user.email
         email_split = email_address.split('@')
         if not obj.uploaded_by:
-            obj.uploaded_by = email_split[0]
+            if fullname:
+                obj.uploaded_by = fullname
+            else:
+                obj.uploaded_by = email_split[0]
         if not obj.newsroom:
             obj.newsroom = email_split[1]
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
