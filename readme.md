@@ -71,6 +71,8 @@ Open your browser and ensure you can see a Django page
 
 ## Test/production server
 
+[Digital Ocean guide](https://www.digitalocean.com/community/tutorials/how-to-serve-django-applications-with-uwsgi-and-nginx-on-ubuntu-16-04#setting-up-the-uwsgi-application-server)
+
 Exit your virtualenv
 
 	deactivate
@@ -79,10 +81,6 @@ Install necessary system packages
 
 	sudo apt-get install python3-dev
 	sudo -H pip3 install uwsgi
-
-Test uwsgi
-
-	uwsgi --http :8000 --home /home/ubuntEnvs/docpub/ --chdir /home/ubuntu/docpub/docpub/ -w docpub.wsgi
 
 Make directory for sites
 
@@ -95,4 +93,3 @@ Make directory for sites
 
 
 
-	

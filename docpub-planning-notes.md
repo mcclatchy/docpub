@@ -54,3 +54,4 @@
 	* https://www.scribd.com/developers (no longer accepting new registrations)
 * TK: create bookmarklet that can grab a PDF open in your browser?
 * TK: ablity to convert word doc to PDF during file upload?
+* TK: should each newsroom get a "project"?
