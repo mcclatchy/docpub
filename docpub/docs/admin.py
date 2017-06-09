@@ -2,13 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 # from django.contrib import messages
-from .models import Document, DocumentCloudCredentials
+from .models import Document#, DocumentCloudCredentials
 
 
 class DocumentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted')
+            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'uploaded_by', 'newsroom', 'embed_code', 'documentcloud_url_formatted')
         }),
         ('Advanced options', {
             'classes': ('collapse',),
@@ -18,7 +18,7 @@ class DocumentAdmin(admin.ModelAdmin):
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
     list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted') ## copy_embed_code
     list_filter = ('access', 'project') # 'updated', 'created', 
-    readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id'
+    readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
 
     # def save_model(self, request, obj, form, change):
@@ -35,35 +35,34 @@ class DocumentAdmin(admin.ModelAdmin):
         self.message_user(request, '%s' % message)
     generate_embed_codes.short_description = 'Get embed codes for selected documents'
 
-
-class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
-    fields = ('user', 'password')
-    list_display = ('user',)
-    # list_editable = ('')
-    # list_filter = 
-    # search_fields = 
-    # exclude  = ('')
-
-
-class UserInline(admin.StackedInline):
-    model = DocumentCloudCredentials
-    # can_delete = False
-    # verbose_name_plural = 'Login'
-
-class UserAdmin(BaseUserAdmin):
-    inlines = (UserInline,)
+    ## save/upload the user and newsroom (should be PRE-SAVE?)
+    def save_model(self, request, obj, form, change):
+        user = request.user
+        email_address = user.email
+        email_split = email_address.split('@')
+        if not obj.uploaded_by:
+            obj.uploaded_by = email_split[0]
+        if not obj.newsroom:
+            obj.newsroom = email_split[1]
+        super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
 
-# from django.forms import CharField, ModelForm, PasswordInput
+# class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
+#     fields = ('user', 'password')
+#     list_display = ('user',)
+#     # list_editable = ('')
+#     # list_filter = 
+#     # search_fields = 
+#     # exclude  = ('')
 
-# class UserForm(ModelForm):
-#     class Meta:
-#         password = CharField(widget=PasswordInput)
-#         model = DocumentCloudCredentials
-#         fields = ('password',)
-#         widgets = {
-#             'password': PasswordInput(),
-#         }
+
+# class UserInline(admin.StackedInline):
+#     model = DocumentCloudCredentials
+#     # can_delete = False
+#     # verbose_name_plural = 'Login'
+
+# class UserAdmin(BaseUserAdmin):
+#     inlines = (UserInline,)
 
 
 ## TEMPLATE
@@ -77,8 +76,8 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(Document, DocumentAdmin)
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
-admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
+# admin.site.unregister(User)
+# admin.site.register(User, UserAdmin)
+# admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
 ## TEMPLATE
 # admin.site.register(, )
