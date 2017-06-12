@@ -6,7 +6,7 @@ from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
 from docpub.settings import DOMAIN, UPLOAD_PATH
 
 
-##### DOCUMNET METHODS #####
+##### DOCUMENT METHODS #####
 def build_project_list():
     ''' dynamically creates a choices list of two-tuples based on the
     DocumentCloud projects for this account. '''
@@ -16,6 +16,8 @@ def build_project_list():
         projects_list.append(project_tuple)
     return projects_list
 
+
+
 ## deletes PDF on file system
 def delete_file(self):
     os.remove(self.file.path)
@@ -24,36 +26,6 @@ def delete_file(self):
 def documentcloud_object(self):
     if self.documentcloud_id:
         return client.documents.get(self.documentcloud_id)
-
-# update info on documentcloud.org on save
-def document_update(self):
-    obj = self.documentcloud_object()
-    for key, value in self.documentcloud_fields.items():
-        setattr(obj, key, value)
-    # self.documentcloud_url = obj.canonical_url
-    obj.save()
-
-# add info to documentcloud.org on create
-def document_upload(self):
-    if self.file or self.link:
-        if self.link:
-            pdf = self.link
-        elif self.file:
-            pdf = self.file
-
-    kwargs = {
-        'title': self.title,
-        'source': self.source,
-        'description': self.description,
-        'related_article': self.related_article,
-        'access': self.access,
-        'secure': self.secure,
-        'project': self.get_project_object(),
-        # 'data': ,
-    }
-    obj = client.documents.upload(pdf, **kwargs)
-    self.documentcloud_id = obj.id
-    self.documentcloud_url = obj.canonical_url
 
 ## generate/update embed code
 def generate_embed(self):
@@ -100,6 +72,66 @@ class Document(BasicInfo):
     title = models.CharField(max_length=255, blank=False, null=True, help_text='Short yet descriptive title (e.g. 2017 House budget proposal). <strong>PUBLIC</strong>')
     uploaded_by = models.CharField(max_length=255, null=True, blank=True, help_text='If left blank, it will grab the first part of your email address (specifically, everything before the @ symbol).')
 
+    class Meta:
+        ordering = ['-created'] # updated might get confusing, but could be more helpful
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if self.updated:
+            self.document_update()
+        else:
+            self.document_upload()
+        ## abstract to get_doc_id() function or function with a while loop?
+        if documentcloud_object(self):
+            obj = documentcloud_object(self)
+            self.documentcloud_pdf_url = obj.pdf_url
+            ## grab the text unless messy text is selected
+            # if not self.messy_text:
+            #     self.text = obj.full_text
+            ## generate the embed
+            generate_embed(self)
+        return super(Document, self).save(*args, **kwargs)
+        ## if we're going to use delete_file(self), include here and then do another return super to save?
+
+    ## adds key-value pairs to document on DocumentCloud
+    def data_dict(self):
+        return {
+            'uploaded_by': self.uploaded_by,
+            'newsroom': self.newsroom[NEWSROOM_CHOICES],
+        }
+
+    # update info on documentcloud.org on save
+    def document_update(self):
+        obj = self.documentcloud_object()
+        for key, value in self.documentcloud_fields.items():
+            setattr(obj, key, value)
+        # self.documentcloud_url = obj.canonical_url
+        obj.save()
+
+    # add info to documentcloud.org on create
+    def document_upload(self):
+        if self.file or self.link:
+            if self.link:
+                pdf = self.link
+            elif self.file:
+                pdf = self.file
+
+        kwargs = {
+            'title': self.title,
+            'source': self.source,
+            'description': self.description,
+            'related_article': self.related_article,
+            'access': self.access,
+            'secure': self.secure,
+            'project': self.get_project_object(),
+            'data': self.data_dict() #{'uploaded_by': 'username', 'newsroom': 'McClatchy'},
+        }
+        obj = client.documents.upload(pdf, **kwargs)
+        self.documentcloud_id = obj.id
+        self.documentcloud_url = obj.canonical_url
+
     def documentcloud_url_formatted(self):
         link = '-'
         if self.documentcloud_id:
@@ -128,35 +160,12 @@ class Document(BasicInfo):
             'secure': self.secure,
             'related_article': self.related_article,
             'project': self.get_project_object(),
-            # 'data': ,
+            'data': self.data_dict() # {'uploaded_by': 'username', 'newsroom': 'McClatchy'},
         }
 
     ## create a button in the admin listview for users to copy a specific embed code
     # def copy_embed_code(self):
         # or put this in admin.py?
-
-    def save(self, *args, **kwargs):
-        if self.updated:
-            document_update(self)
-        else:
-            document_upload(self)
-        ## abstract to get_doc_id() function or function with a while loop?
-        if documentcloud_object(self):
-            obj = documentcloud_object(self)
-            self.documentcloud_pdf_url = obj.pdf_url
-            ## grab the text unless messy text is selected
-            # if not self.messy_text:
-            #     self.text = obj.full_text
-            ## generate the embed
-            generate_embed(self)
-        return super(Document, self).save(*args, **kwargs)
-        ## if we're going to use delete_file(self), include here and then do another return super to save?
-
-    class Meta:
-        ordering = ['-created'] # updated might get confusing, but could be more helpful
-
-    def __str__(self):
-        return self.title
 
 ## in save method? post save? for text, etc -- anything else that wouldn't initially be available
     # obj = client.documents.get(obj.id)
@@ -168,16 +177,16 @@ class Document(BasicInfo):
     # obj.pdf_url
 
 
-# class DocumentCloudCredentials(BasicInfo):
-#     # email = models.EmailField(max_length=254, help_text='Email address for user in DocPub must be the same as DocumentCloud email address.')
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     password = models.CharField(max_length=255, verbose_name='DocumentCloud password')
+class DocumentCloudCredentials(BasicInfo):
+    # email = models.EmailField(max_length=254, help_text='Email address for user in DocPub must be the same as DocumentCloud email address.')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    password = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud password')
 
-#     class Meta:
-#         ordering = ['-created'] # updated might get confusing, but could be more helpful
-#         verbose_name = 'DocumentCloud login'
+    class Meta:
+        ordering = ['-created'] # updated might get confusing, but could be more helpful
+        verbose_name = 'DocumentCloud login'
 
-#     def __str__(self):
-#         return self.user.email
+    def __str__(self):
+        return self.user.email
 
 

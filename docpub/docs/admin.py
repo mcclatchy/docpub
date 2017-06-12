@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 # from django.contrib import messages
-from .models import Document#, DocumentCloudCredentials
+from .models import Document, DocumentCloudCredentials
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -51,22 +51,22 @@ class DocumentAdmin(admin.ModelAdmin):
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
 
-# class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
-#     fields = ('user', 'password')
-#     list_display = ('user',)
-#     # list_editable = ('')
-#     # list_filter = 
-#     # search_fields = 
-#     # exclude  = ('')
+class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
+    fields = ('user', 'password')
+    list_display = ('user',)
+    # list_editable = ('')
+    # list_filter = ('')
+    # search_fields = ('')
+    # exclude  = ('')
 
 
-# class UserInline(admin.StackedInline):
-#     model = DocumentCloudCredentials
-#     # can_delete = False
-#     # verbose_name_plural = 'Login'
+class UserInline(admin.StackedInline):
+    model = DocumentCloudCredentials
+    # can_delete = False
+    # verbose_name_plural = 'Login'
 
-# class UserAdmin(BaseUserAdmin):
-#     inlines = (UserInline,)
+class UserAdmin(BaseUserAdmin):
+    inlines = (UserInline,)
 
 
 ## TEMPLATE
@@ -80,8 +80,8 @@ class DocumentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Document, DocumentAdmin)
-# admin.site.unregister(User)
-# admin.site.register(User, UserAdmin)
-# admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
 ## TEMPLATE
 # admin.site.register(, )
