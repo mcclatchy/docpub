@@ -6,3 +6,4 @@ settings_private*
 static/
 migrations/
 uploads/
+server-info.md
