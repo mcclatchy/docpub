@@ -1,6 +1,8 @@
 
 # Prerequisites
 
+* Mac OS X (local server)
+* Ubuntu 16 (test/prod server)
 * Python 3.x (e.g. Python 3.5.1)
 	* check your version by running `python3 --version`
 * virtualenv
@@ -8,9 +10,7 @@
 * git
 * sqlite
 
-# Setup
-
-## Local repo
+# Local setup
 
 Clone the repo
 
@@ -32,7 +32,7 @@ Add this to your `bash_profile` (e.g. Mac) or `bash_rc` (e.g. Linux)
 
 Install the requirements 
 
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt
 
 ## Private settings
 
@@ -43,18 +43,11 @@ Create a private settings file
 Add your Django secret key and DocumentCloud credentials
 
 	SECRET_KEY = ''
+	ALLOWED_HOSTS = ['']
 	DC_USERNAME = ''
 	DC_PASSWORD = ''
 
-## Test/prod server
-
-Clone the repo
-
-	git clone git@github.com:mcclatchy/docpub.git
-
-# Dev work
-
-## Local server
+# Local server
 
 Start it 
 
@@ -69,15 +62,110 @@ Open your browser and ensure you can see a Django page
 
 	http://127.0.0.1:8100/
 
-## Test/production server
+# Test/production server
 
-[Digital Ocean guide](https://www.digitalocean.com/community/tutorials/how-to-serve-django-applications-with-uwsgi-and-nginx-on-ubuntu-16-04#setting-up-the-uwsgi-application-server)
+Thanks to this [Digital Ocean guide](https://www.digitalocean.com/community/tutorials/how-to-serve-django-applications-with-uwsgi-and-nginx-on-ubuntu-16-04#setting-up-the-uwsgi-application-server).
+
+## System installations and config
+
+Update your system
+
+	sudo apt-get update
+	sudo apt-get upgrade
+
+Install necessary system packages
+
+	sudo apt-get install python3-pip
+	sudo -H pip3 install virtualenv virtualenvwrapper
+
+Add the following to your `.bashrc` file
+
+	## virtualenvwrapper vars
+	export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+
+	export WORKON_HOME=~/Envs
+	source /usr/local/bin/virtualenvwrapper.sh
+
+	## DOCPUB APP
+	alias docpub='workon docpub && cd ~/docpub/docpub'
+
+Make the virtualenvs directory
+
+	mkdir -p ~/Envs
+
+Enable the new settings
+
+	source ~/.bashrc
+
+Add an SSH key in your GitHub account
+
+	https://help.github.com/articles/generating-an-ssh-key/
+
+Clone the repo (or your fork)
+
+	git clone git@github.com:mcclatchy/docpub.git
+
+Create your virtualenv
+
+	mkvirtualenv docpub
+
+Enable the virtualenv
+
+	docpub
+
+### Set up the Django app
+
+Install the requirements file (`../` included because `docpub` command takes you one level deeper)
+
+	pip3 install -r ../requirements.txt
+
+Create a private settings file
+
+	vim ~/docpub/docpub/docpub/settings_private.py
+
+Add your Django secret key and DocumentCloud credentials
+
+	SECRET_KEY = ''
+	ALLOWED_HOSTS = ['']
+	DC_USERNAME = ''
+	DC_PASSWORD = ''
+
+Initial migration for admin tables
+
+	python3 manage.py migrate
+
+Initial migration for the app
+
+	python3 manage.py makemigrations docs
+	python3 manage.py migrate
+
+Create a super user
+
+	python3 manage.py createsuperuser
+
+Update the firewall permissions
+
+	sudo ufw allow 8080
+
+Test the local server
+
+	python3 manage.py runserver 0.0.0.0:8080
+
+Go here, confirm the admin login page appears and log in to confirm everything works as expected.
+	
+	your-domain.com/admin
+
+Stop the local server
+
+	Ctrl + C
+
+## Set up uWSGI application server
 
 Exit your virtualenv
 
 	deactivate
 
-Install necessary system packages
+Install key pieces 
 
 	sudo apt-get install python3-dev
 	sudo -H pip3 install uwsgi
@@ -86,10 +174,110 @@ Make directory for sites
 
 	sudo mkdir -p /etc/uwsgi/sites
 
+Make the ini file
 
+	sudo vim /etc/uwsgi/sites/docpub.ini
 
+Paste in these settings
 
+	[uwsgi]
 
+	logto = /var/log/uwsgi/error.log
 
+	project = docpub
+	uid = ubuntu
+	base = /home/%(uid)
 
+	chdir = %(base)/%(project)/%(project)
+	home = %(base)/Envs/%(project)
+	module = %(project).wsgi:application
 
+	master = true
+	processes = 5
+
+	socket = /run/uwsgi/%(project).sock
+	chown-socket = %(uid):www-data
+	chmod-socket = 660
+	vacuum = true
+
+Create a systemd unit file 
+
+	sudo vim /etc/systemd/system/uwsgi.service
+
+Paste this 
+
+	[Unit]
+	Description=uWSGI Emperor service
+
+	[Service]
+	ExecStartPre=/bin/bash -c 'mkdir -p /run/uwsgi; chown ubuntu:www-data /run/uwsgi'
+	ExecStart=/usr/local/bin/uwsgi --emperor /etc/uwsgi/sites
+	Restart=always
+	KillSignal=SIGQUIT
+	Type=notify
+	NotifyAccess=all
+
+	[Install]
+	WantedBy=multi-user.target
+
+## Set up nginx reverse proxy cache
+
+Install nginx 
+
+	sudo apt-get install nginx
+
+Create a config file
+
+	sudo vim /etc/nginx/sites-available/docpub
+
+Add this
+
+	server {
+	    listen 80;
+	    server_name YOUR-DOMAIN.COM;
+	    access_log /var/log/nginx/docpub_access.log;
+	    error_log /var/log/nginx/docpub_error.log;
+
+	    location = /favicon.ico { access_log off; log_not_found off; }
+
+	    location /static/ {
+	        root /home/ubuntu/docpub/docpub;
+	    }
+
+	    location / {
+	        include         uwsgi_params;
+	        uwsgi_pass      unix:/run/uwsgi/docpub.sock;
+	    }
+	}	
+
+Remove the symlink for the default site
+
+	sudo rm /etc/nginx/sites-enabled/default
+
+Symlink the available site to an enable site
+
+	sudo ln -s /etc/nginx/sites-available/docpub /etc/nginx/sites-enabled
+
+Check the configuration
+
+	sudo nginx -t
+
+## Server final prep
+
+Restart nginx
+
+	sudo systemctl restart nginx
+
+Start uwsgi
+	
+	sudo systemctl start uwsgi
+
+Update the firewall rules
+
+	sudo ufw delete allow 8080
+	sudo ufw allow 'Nginx Full'
+
+Enable uwsgi and nginx to run on startup
+
+	sudo systemctl enable nginx
+	sudo systemctl enable uwsgi
