@@ -55,3 +55,5 @@
 * TK: create bookmarklet that can grab a PDF open in your browser?
 * TK: ablity to convert word doc to PDF during file upload?
 * TK: should each newsroom get a "project"?
+* NOTE: basically I should require everyone to have their own account to use the new
+* TK: media queries: 400 or 450 for phone, 600 for desktop (suggestion via Nathaniel)
