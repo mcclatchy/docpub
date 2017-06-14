@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-from .settings_private import SECRET_KEY, ALLOWED_HOSTS
+from .settings_private import *
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
