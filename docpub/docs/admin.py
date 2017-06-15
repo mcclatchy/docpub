@@ -3,12 +3,14 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 # from django.contrib import messages
 from .models import Document, DocumentCloudCredentials
+from docs.connection import connection
+from docpub.settings import DC_USERNAME, DC_PASSWORD
 
 
 class DocumentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'uploaded_by', 'newsroom', 'embed_code', 'documentcloud_url_formatted')
+            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code', 'documentcloud_url_formatted') #'project',
         }),
         ('Advanced options', {
             'classes': ('collapse',),
@@ -17,7 +19,7 @@ class DocumentAdmin(admin.ModelAdmin):
     )
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
     list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted') ## copy_embed_code
-    list_filter = ('access', 'project') # 'updated', 'created', 
+    list_filter = ('access',) # 'project', 'updated', 'created',
     readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
 
@@ -38,8 +40,21 @@ class DocumentAdmin(admin.ModelAdmin):
     ## save/upload the user and newsroom (should be PRE-SAVE?)
     def save_model(self, request, obj, form, change):
         user = request.user
-        fullname = user.get_full_name()
         email_address = user.email
+        ## choose which DocumentCloud.org creds to use
+        documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
+        documentcloud_password = documentcloud_login[0].password
+        if documentcloud_password:
+            client = connection(email_address, documentcloud_password)
+            ## if this fails, need a way to notify user that their creds are wrong; and/or fallback to shared account?
+        else:
+            client = connection(DC_USERNAME, DC_PASSWORD)
+        if obj.updated:
+            obj.document_update(client)
+        else:
+            obj.document_upload(client)
+        ## populate uploaded_by and newsroom
+        fullname = user.get_full_name()
         email_split = email_address.split('@')
         if not obj.uploaded_by:
             if fullname:
@@ -51,6 +66,7 @@ class DocumentAdmin(admin.ModelAdmin):
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
 
+# from docs.forms import PasswordInline
 class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
     fields = ('user', 'password')
     list_display = ('user',)
@@ -58,6 +74,7 @@ class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
     # list_filter = ('')
     # search_fields = ('')
     # exclude  = ('')
+    readonly_fields = ('user', 'password',)
 
 
 class UserInline(admin.StackedInline):

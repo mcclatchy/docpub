@@ -1,29 +1,26 @@
 from django.db import models
 from django.utils.html import format_html
 from django.contrib.auth.models import User
-from docs.connection import client
 from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
-from docpub.settings import DOMAIN, UPLOAD_PATH
+from docpub.settings import UPLOAD_PATH
 
 
 ##### DOCUMENT METHODS #####
-def build_project_list():
-    ''' dynamically creates a choices list of two-tuples based on the
-    DocumentCloud projects for this account. '''
+
+## dynamically creates a choices list based on the Document Cloud projects for the associated account
+def build_project_list(client):
     projects_list = []
     for project in client.projects.all():
         project_tuple = (project.title, project.title)
         projects_list.append(project_tuple)
     return projects_list
 
-
-
 ## deletes PDF on file system
 def delete_file(self):
     os.remove(self.file.path)
 
 ## get a specific document object on DocumentCloud
-def documentcloud_object(self):
+def documentcloud_object(self, client):
     if self.documentcloud_id:
         return client.documents.get(self.documentcloud_id)
 
@@ -63,7 +60,7 @@ class Document(BasicInfo):
         - The PDF cannot be changed or updated after you hit save for the first time &mdash; no matter which way you add it. <strong>PUBLIC</strong>')
     messy_text = models.BooleanField(default=False, help_text='Check this box if the "Plain text" is too messy to include or clean up manually. A link to the PDF will be displayed on mobile with no plain text version.')
     newsroom = models.CharField(max_length=255, null=True, blank=True, choices=NEWSROOM_CHOICES, help_text='If left blank, it will set the newsroom based on the domain of the email account you use for this tool.')
-    project = models.CharField(max_length=255, null=True, blank=True, choices=build_project_list(), help_text='Optional, but helpful. Cannot be updated from here after initially set -- must be changed in DocumentCloud.') ## UPDATE: remove blank=True to make required?
+    # project = models.CharField(max_length=255, null=True, blank=True, choices=build_project_list(client), help_text='Optional, but helpful. Cannot be updated from here after initially set -- must be changed in DocumentCloud.') ## UPDATE: remove blank=True to make required?
     related_article = models.URLField(max_length=255, blank=True, null=True, help_text='Optional link to the story this document relates to. <strong>PUBLIC</strong>')
     secure = models.BooleanField(blank=True, default=False, help_text='Is this document sensitive or should it not be sent to third-party services (e.g. OpenCalais for text analysis)?')
     sidebar = models.BooleanField(blank=True, default=False, verbose_name='Enable document viewer sidebar?', help_text='Not recommended for article page embeds. This really only works well when used with a full-width template.')
@@ -79,39 +76,43 @@ class Document(BasicInfo):
         return self.title
 
     def save(self, *args, **kwargs):
-        if self.updated:
-            self.document_update()
-        else:
-            self.document_upload()
+        # if self.updated:
+        #     self.document_update()
+        # else:
+        #     self.document_upload()
         ## abstract to get_doc_id() function or function with a while loop?
-        if documentcloud_object(self):
-            obj = documentcloud_object(self)
+        try:
+            obj = documentcloud_object(self, client)
             self.documentcloud_pdf_url = obj.pdf_url
             ## grab the text unless messy text is selected
             # if not self.messy_text:
             #     self.text = obj.full_text
             ## generate the embed
             generate_embed(self)
+        except:
+            pass
         return super(Document, self).save(*args, **kwargs)
         ## if we're going to use delete_file(self), include here and then do another return super to save?
 
     ## adds key-value pairs to document on DocumentCloud
     def data_dict(self):
+        newsroom = self.newsroom
+        newsroom_dict = dict(NEWSROOM_CHOICES)
         return {
             'uploaded_by': self.uploaded_by,
-            'newsroom': self.newsroom[NEWSROOM_CHOICES],
+            'newsroom': newsroom_dict[newsroom],
         }
 
-    # update info on documentcloud.org on save
-    def document_update(self):
-        obj = self.documentcloud_object()
+    ## update info on documentcloud.org on save
+    def document_update(self, client):
+        obj = self.documentcloud_object(client)
         for key, value in self.documentcloud_fields.items():
             setattr(obj, key, value)
         # self.documentcloud_url = obj.canonical_url
         obj.save()
 
     # add info to documentcloud.org on create
-    def document_upload(self):
+    def document_upload(self, client):
         if self.file or self.link:
             if self.link:
                 pdf = self.link
@@ -125,7 +126,7 @@ class Document(BasicInfo):
             'related_article': self.related_article,
             'access': self.access,
             'secure': self.secure,
-            'project': self.get_project_object(),
+            # 'project': self.get_project_object(),
             'data': self.data_dict() #{'uploaded_by': 'username', 'newsroom': 'McClatchy'},
         }
         obj = client.documents.upload(pdf, **kwargs)
@@ -140,11 +141,11 @@ class Document(BasicInfo):
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
     ## get a specific document object on DocumentCloud
-    def documentcloud_object(self):
+    def documentcloud_object(self, client):
         if self.documentcloud_id:
             return client.documents.get(self.documentcloud_id)
 
-    def get_project_object(self):
+    def get_project_object(self, client):
         if self.project:
             project = client.projects.get_by_title(self.project)
             return str(project.id)
@@ -159,7 +160,7 @@ class Document(BasicInfo):
             'access': self.access,
             'secure': self.secure,
             'related_article': self.related_article,
-            'project': self.get_project_object(),
+            # 'project': self.get_project_object(),
             'data': self.data_dict() # {'uploaded_by': 'username', 'newsroom': 'McClatchy'},
         }
 
