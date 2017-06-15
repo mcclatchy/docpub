@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .models import Document, DocumentCloudCredentials
 from docs.connection import connection
 from docpub.settings import DC_USERNAME, DC_PASSWORD
+from docs.forms import PasswordInline
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -66,7 +67,6 @@ class DocumentAdmin(admin.ModelAdmin):
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
 
-# from docs.forms import PasswordInline
 class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
     fields = ('user', 'password')
     list_display = ('user',)
@@ -79,6 +79,7 @@ class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
 
 class UserInline(admin.StackedInline):
     model = DocumentCloudCredentials
+    form = PasswordInline
     # can_delete = False
     # verbose_name_plural = 'Login'
 
