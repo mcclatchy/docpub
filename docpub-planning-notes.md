@@ -20,7 +20,7 @@
 *EMBED CODE*
 * one-click button to copy and/or click within the field to select-all automatically
 	* https://codepen.io/shaikmaqsood/pen/XmydxJ/
-* how to handle for mobile apps?
+* how to handle for mobile apps? just construct iframe embed from DocumentCloud html version
 	* generate upload html file with embed code to S3 and provide iframe?
 	* pre-fix code to control display
 		* leave as is on desktop
@@ -33,7 +33,7 @@
 
 * COMPLETE: for admin fields, note which are displayed publicly 
 
-* PUNT: doccloud creds in django user; if not, then use master account 
+* COMPLETE: doccloud creds in django user; if not, then use master account 
 	* this is tough bc then file edits by another user don't work and you end up recreating the DocumentCloud.org admin
 
 * COMPLETE: workflow
@@ -41,11 +41,14 @@
 	* view form
 	* submit + get embed code
 
-* PUNT: create bookmarklet that can grab a PDF open in your browser?
-
 * NOTE: I should require everyone to have their own DocCloud.org account to use the tool
 
 * TK: media queries: 400 or 450 for phone, 600 for desktop (suggestion via Nathaniel)
+
+* PUNT: create bookmarklet that can grab a PDF open in your browser?
+
+* TK: click to copy the embed code in the admin:
+	* e.g. https://codepen.io/shaikmaqsood/pen/XmydxJ/
 
 * TK: use Google oauth for login?
 	* https://developers.google.com/api-client-library/python/start/get_started
