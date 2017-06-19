@@ -19,21 +19,16 @@ def build_project_list(client):
 def delete_file(self):
     os.remove(self.file.path)
 
-## get a specific document object on DocumentCloud
-def documentcloud_object(self, client):
-    if self.documentcloud_id:
-        return client.documents.get(self.documentcloud_id)
-
 ## generate/update embed code
 def generate_embed(self):
     doc_id = self.documentcloud_id
     doc_sidebar = str(self.sidebar).lower()
-    style_height = '<style>@media (max-width: 420px) iframe {height: 500px;}</style>'
+    style_embed = '<style>@media (max-width: 420px) iframe {height: 500px;}</style>' ## switch to external stylesheet?
     iframe_embed = '<div><iframe src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}" style="border:none;width:100%;height:500px"></iframe></div>'.format(
             id=doc_id,
             sidebar=doc_sidebar
         ) # desktop height 930px, mobile height 500px
-    self.embed_code = style_height + iframe_embed
+    self.embed_code = style_embed + iframe_embed
 
 
 ##### MODELS #####
