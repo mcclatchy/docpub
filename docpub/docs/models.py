@@ -96,11 +96,9 @@ class Document(BasicInfo):
 
     ## adds key-value pairs to document on DocumentCloud
     def data_dict(self):
-        newsroom = self.newsroom
-        newsroom_dict = dict(NEWSROOM_CHOICES)
         return {
             'uploaded_by': self.uploaded_by,
-            'newsroom': newsroom_dict[newsroom],
+            'newsroom': self.newsroom,
         }
 
     ## update info on documentcloud.org on save

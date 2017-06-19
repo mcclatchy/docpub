@@ -42,6 +42,18 @@ class DocumentAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         user = request.user
         email_address = user.email
+
+        ## populate uploaded_by and newsroom
+        fullname = user.get_full_name()
+        email_split = email_address.split('@')
+        if not obj.uploaded_by:
+            if fullname:
+                obj.uploaded_by = fullname
+            else:
+                obj.uploaded_by = email_split[0]
+        if not obj.newsroom:
+            obj.newsroom = email_split[1]
+            
         ## choose which DocumentCloud.org creds to use
         documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
         documentcloud_password = documentcloud_login[0].password
@@ -54,16 +66,7 @@ class DocumentAdmin(admin.ModelAdmin):
             obj.document_update(client)
         else:
             obj.document_upload(client)
-        ## populate uploaded_by and newsroom
-        fullname = user.get_full_name()
-        email_split = email_address.split('@')
-        if not obj.uploaded_by:
-            if fullname:
-                obj.uploaded_by = fullname
-            else:
-                obj.uploaded_by = email_split[0]
-        if not obj.newsroom:
-            obj.newsroom = email_split[1]
+
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
 
