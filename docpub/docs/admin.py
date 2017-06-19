@@ -53,7 +53,7 @@ class DocumentAdmin(admin.ModelAdmin):
                 obj.uploaded_by = email_split[0]
         if not obj.newsroom:
             obj.newsroom = email_split[1]
-            
+
         ## choose which DocumentCloud.org creds to use
         documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
         documentcloud_password = documentcloud_login[0].password
@@ -70,14 +70,10 @@ class DocumentAdmin(admin.ModelAdmin):
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
 
-class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
-    fields = ('user', 'password')
-    list_display = ('user',)
-    # list_editable = ('')
-    # list_filter = ('')
-    # search_fields = ('')
-    # exclude  = ('')
-    readonly_fields = ('user', 'password',)
+# class DocumentCloudCredentialsAdmin(admin.ModelAdmin):
+#     fields = ('user',)
+#     list_display = ('user',)
+#     readonly_fields = ('user',)
 
 
 class UserInline(admin.StackedInline):
@@ -103,6 +99,6 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(Document, DocumentAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
+# admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
 ## TEMPLATE
 # admin.site.register(, )
