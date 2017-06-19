@@ -185,7 +185,8 @@ class DocumentCloudCredentials(BasicInfo):
 
     class Meta:
         ordering = ['-created'] # updated might get confusing, but could be more helpful
-        verbose_name = 'DocumentCloud login'
+        verbose_name = 'DocumentCloud account info'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.user.email
