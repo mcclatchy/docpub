@@ -67,6 +67,9 @@ class DocumentAdmin(admin.ModelAdmin):
         else:
             obj.document_upload(client)
 
+        ## generate the embed
+        obj.generate_embed()
+
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
 

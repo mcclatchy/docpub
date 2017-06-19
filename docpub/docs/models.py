@@ -19,17 +19,6 @@ def build_project_list(client):
 def delete_file(self):
     os.remove(self.file.path)
 
-## generate/update embed code
-def generate_embed(self):
-    doc_id = self.documentcloud_id
-    doc_sidebar = str(self.sidebar).lower()
-    style_embed = '<style>@media (max-width: 420px) iframe {height: 500px;}</style>' ## switch to external stylesheet?
-    iframe_embed = '<div><iframe src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}" style="border:none;width:100%;height:500px"></iframe></div>'.format(
-            id=doc_id,
-            sidebar=doc_sidebar
-        ) # desktop height 930px, mobile height 500px
-    self.embed_code = style_embed + iframe_embed
-
 
 ##### MODELS #####
 class BasicInfo(models.Model):
@@ -82,8 +71,6 @@ class Document(BasicInfo):
             ## grab the text unless messy text is selected
             # if not self.messy_text:
             #     self.text = obj.full_text
-            ## generate the embed
-            generate_embed(self)
         except:
             pass
         return super(Document, self).save(*args, **kwargs)
@@ -156,6 +143,17 @@ class Document(BasicInfo):
             # 'project': self.get_project_object(),
             'data': self.data_dict() # {'uploaded_by': 'username', 'newsroom': 'McClatchy'},
         }
+
+    ## generate/update embed code
+    def generate_embed(self):
+        doc_id = self.documentcloud_id
+        doc_sidebar = str(self.sidebar).lower()
+        style_embed = '<style>@media (max-width: 420px) iframe {height: 500px;}</style>' ## switch to external stylesheet?
+        iframe_embed = '<div><iframe src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}" style="border:none;width:100%;height:500px"></iframe></div>'.format(
+                id=doc_id,
+                sidebar=doc_sidebar
+            ) # desktop height 930px, mobile height 500px
+        self.embed_code = style_embed + iframe_embed
 
     ## create a button in the admin listview for users to copy a specific embed code
     # def copy_embed_code(self):
