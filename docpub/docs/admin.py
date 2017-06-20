@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # from django.contrib import messages
 from .models import Document, DocumentCloudCredentials
 from docs.connection import connection
-from docpub.settings import DC_USERNAME, DC_PASSWORD
+from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY
 from docs.forms import PasswordInline
 
 
@@ -24,10 +24,13 @@ class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
 
-    # def save_model(self, request, obj, form, change):
-    #     if not 'file' or 'link' in form.changed_data:
-    #         messages.add_message(request, messages.INFO, 'You must upload or link to a PDF')
-    #     # super(CarAdmin, self).save_model(request, obj, form, change)
+    ## only show the current users docs
+    # def get_queryset(self, request):
+    #     qs = super(DocumentAdmin, self).get_queryset(request)
+    #     if request.user.is_superuser:
+    #         return qs
+    #     else:
+    #         return qs.filter(uploaded_by=request.user)
 
     ## add admin action to generate document embed code list for user
     def generate_embed_codes(self, request, queryset):
@@ -46,13 +49,21 @@ class DocumentAdmin(admin.ModelAdmin):
         ## populate uploaded_by and newsroom
         fullname = user.get_full_name()
         email_split = email_address.split('@')
+        uploaded_by = obj.uploaded_by
+        newsroom = obj.newsroom
+
         if not obj.uploaded_by:
             if fullname:
                 obj.uploaded_by = fullname
-            else:
+            elif email_address:
                 obj.uploaded_by = email_split[0]
+            else:
+                obj.uploaded_by = user.username
         if not obj.newsroom:
-            obj.newsroom = email_split[1]
+            if email_address:
+                obj.newsroom = email_split[1]
+            else:
+                obj.newsroom = '%s (unspecified)' % (company)
 
         ## choose which DocumentCloud.org creds to use
         documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
