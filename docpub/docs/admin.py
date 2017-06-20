@@ -25,12 +25,12 @@ class DocumentAdmin(admin.ModelAdmin):
     actions = ('generate_embed_codes')
 
     ## only show the current users docs
-    # def get_queryset(self, request):
-    #     qs = super(DocumentAdmin, self).get_queryset(request)
-    #     if request.user.is_superuser:
-    #         return qs
-    #     else:
-    #         return qs.filter(uploaded_by=request.user)
+    def get_queryset(self, request):
+        qs = super(DocumentAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(uploaded_by=request.user)
 
     ## add admin action to generate document embed code list for user
     def generate_embed_codes(self, request, queryset):
