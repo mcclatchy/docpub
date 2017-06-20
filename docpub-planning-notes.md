@@ -29,19 +29,18 @@
 		* having issues with this; will we need to grab and host on S3?
 
 *NOTES*
-* why does documentcloud_object not work inside the Document class for upload and not outside for updating? right now it's duplicated, grrr...
-
 * COMPLETE: for admin fields, note which are displayed publicly 
 
 * COMPLETE: doccloud creds in django user; if not, then use master account 
-	* this is tough bc then file edits by another user don't work and you end up recreating the DocumentCloud.org admin
+	
+* TK: Only show logged in user the files they -- or their org? -- have uploaded?
 
 * COMPLETE: workflow
 	* add / edit
 	* view form
 	* submit + get embed code
 
-* NOTE: I should require everyone to have their own DocCloud.org account to use the tool
+* Q: require everyone to have their own DocCloud.org account to use the tool?
 
 * TK: media queries: 400 or 450 for phone, 600 for desktop (suggestion via Nathaniel)
 
