@@ -5,18 +5,18 @@ from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
 from docpub.settings import UPLOAD_PATH
 
 
-##### DOCUMENT METHODS #####
+##### GENERAL FUNCTIONS #####
 
-## dynamically creates a choices list based on the Document Cloud projects for the associated account
 def build_project_list(client):
+    """ dynamically create a choices list based on the Document Cloud projects for the associated account """
     projects_list = []
     for project in client.projects.all():
         project_tuple = (project.title, project.title)
         projects_list.append(project_tuple)
     return projects_list
 
-## deletes PDF on file system
 def delete_file(self):
+    """ delete PDF on file system """
     os.remove(self.file.path)
 
 
@@ -76,24 +76,24 @@ class Document(BasicInfo):
         return super(Document, self).save(*args, **kwargs)
         ## if we're going to use delete_file(self), include here and then do another return super to save?
 
-    ## adds key-value pairs to document on DocumentCloud
     def data_dict(self):
+        """ add key-value pairs to document on DocumentCloud """
         newsrooms = dict(NEWSROOM_CHOICES)
         return {
             'uploaded_by': self.uploaded_by,
             'newsroom': newsrooms[self.newsroom],
         }
 
-    ## update info on documentcloud.org on save
     def document_update(self, client):
+        """ update info on DocumentCloud on save """
         obj = self.documentcloud_object(client)
         for key, value in self.documentcloud_fields.items():
             setattr(obj, key, value)
         # self.documentcloud_url = obj.canonical_url
         obj.save()
 
-    # add info to documentcloud.org on create
     def document_upload(self, client):
+        """ add info to DocumentCloud on create """
         if self.file or self.link:
             if self.link:
                 pdf = self.link
@@ -115,25 +115,27 @@ class Document(BasicInfo):
         self.documentcloud_url = obj.canonical_url
 
     def documentcloud_url_formatted(self):
+        """ display the DocumentCloud URL as a clickable link in the admin"""
         link = '-'
         if self.documentcloud_id:
             link = format_html('<a href="{}">View/edit on DocumentCloud</a>'.format(self.documentcloud_url))
         return link
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
-    ## get a specific document object on DocumentCloud
     def documentcloud_object(self, client):
+        """ retrieve a specific document object on DocumentCloud """
         if self.documentcloud_id:
             return client.documents.get(self.documentcloud_id)
 
     def get_project_object(self, client):
+        """ retrieve a specific project on DocumentCloud """
         if self.project:
             project = client.projects.get_by_title(self.project)
             return str(project.id)
 
-    # map django model fields to documentcloud.org fields
     @property
     def documentcloud_fields(self):
+        """ map Document model fields to DocumentCloud fields """
         return {
             'title': self.title,
             'source': self.source,
@@ -145,8 +147,8 @@ class Document(BasicInfo):
             'data': self.data_dict() # {'uploaded_by': 'username', 'newsroom': 'McClatchy'},
         }
 
-    ## generate/update embed code
     def generate_embed(self):
+        """ generate the embed code """
         doc_id = self.documentcloud_id
         doc_sidebar = str(self.sidebar).lower()
         style_embed = ''
@@ -156,10 +158,6 @@ class Document(BasicInfo):
                 sidebar=doc_sidebar
             ) # desktop height 930px, mobile height 500px
         self.embed_code = style_embed + iframe_embed
-
-    ## create a button in the admin listview for users to copy a specific embed code
-    # def copy_embed_code(self):
-        # or put this in admin.py?
 
 ## in save method? post save? for text, etc -- anything else that wouldn't initially be available
     # obj = client.documents.get(obj.id)

@@ -24,16 +24,20 @@ class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
 
-    ## only show the current users docs
     def get_queryset(self, request):
+        """ only show the current users docs """
         qs = super(DocumentAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         else:
             return qs.filter(uploaded_by=request.user)
 
-    ## add admin action to generate document embed code list for user
+    # def copy_embed_code(self, obj):
+        """ create a button in the admin for users to copy a specific embed code """
+
+
     def generate_embed_codes(self, request, queryset):
+        """ add admin action to generate document embed code list for user """
         message = ''
         for document in queryset:
             message += str(document.embed_code)
@@ -41,8 +45,8 @@ class DocumentAdmin(admin.ModelAdmin):
         self.message_user(request, '%s' % message)
     generate_embed_codes.short_description = 'Get embed codes for selected documents'
 
-    ## save/upload the user and newsroom (should be PRE-SAVE?)
     def save_model(self, request, obj, form, change):
+        """ save/add to DocumentCloud.org """
         user = request.user
         email_address = user.email
 
