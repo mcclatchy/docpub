@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.html import format_html
 from django.contrib.auth.models import User
 from docpub.settings import UPLOAD_PATH
 from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
@@ -113,14 +112,6 @@ class Document(BasicInfo):
         obj = client.documents.upload(pdf, **kwargs)
         self.documentcloud_id = obj.id
         self.documentcloud_url = obj.canonical_url
-
-    def documentcloud_url_formatted(self):
-        """ display the DocumentCloud URL as a clickable link in the admin"""
-        link = '-'
-        if self.documentcloud_id:
-            link = format_html('<a href="{}">View/edit on DocumentCloud</a>'.format(self.documentcloud_url))
-        return link
-    documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
     def documentcloud_object(self, client):
         """ retrieve a specific document object on DocumentCloud """

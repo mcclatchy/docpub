@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
+from django.utils.html import format_html
 # from django.contrib import messages
 from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY
 from .models import Document, DocumentCloudCredentials
@@ -24,6 +25,14 @@ class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
 
+    def documentcloud_url_formatted(self, obj):
+        """ display the DocumentCloud URL as a clickable link in the admin"""
+        link = '-'
+        if obj.documentcloud_id:
+            link = format_html('<a href="{}">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
+        return link
+    documentcloud_url_formatted.short_description = 'DocumentCloud link'
+
     def get_queryset(self, request):
         """ only show the current users docs """
         qs = super(DocumentAdmin, self).get_queryset(request)
@@ -34,6 +43,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
     # def copy_embed_code(self, obj):
         """ create a button in the admin for users to copy a specific embed code """
+        return 
 
 
     def generate_embed_codes(self, request, queryset):
