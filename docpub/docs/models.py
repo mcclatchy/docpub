@@ -78,9 +78,10 @@ class Document(BasicInfo):
 
     ## adds key-value pairs to document on DocumentCloud
     def data_dict(self):
+        newsrooms = dict(NEWSROOM_CHOICES)
         return {
             'uploaded_by': self.uploaded_by,
-            'newsroom': self.newsroom,
+            'newsroom': newsrooms[self.newsroom],
         }
 
     ## update info on documentcloud.org on save
@@ -148,7 +149,8 @@ class Document(BasicInfo):
     def generate_embed(self):
         doc_id = self.documentcloud_id
         doc_sidebar = str(self.sidebar).lower()
-        style_embed = '<style>@media (max-width: 420px) iframe {height: 500px;}</style>' ## switch to external stylesheet?
+        style_embed = ''
+        # style_embed = '<style>@media (max-width: 420px) iframe {height: 500px;}</style>' ## switch to external stylesheet?
         iframe_embed = '<div><iframe src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}" style="border:none;width:100%;height:500px"></iframe></div>'.format(
                 id=doc_id,
                 sidebar=doc_sidebar
