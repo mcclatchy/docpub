@@ -2,9 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 # from django.contrib import messages
+from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY
 from .models import Document, DocumentCloudCredentials
 from docs.connection import connection
-from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY
 from docs.forms import PasswordInline
 
 
