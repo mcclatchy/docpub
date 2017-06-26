@@ -12,7 +12,7 @@ from docs.forms import PasswordInline
 class DocumentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code', 'documentcloud_url_formatted') #'project',
+            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code', 'documentcloud_url_formatted') #'project', 'copy_embed_code',
         }),
         ('Advanced options', {
             'classes': ('collapse',),
@@ -20,16 +20,25 @@ class DocumentAdmin(admin.ModelAdmin):
         })
     )
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
-    list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted') ## copy_embed_code
+    list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted',) # 'copy_embed_code'
     list_filter = ('access',) # 'project', 'updated', 'created',
     readonly_fields = ('embed_code', 'documentcloud_url_formatted',) # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
+
+    # def copy_embed_code(self, obj):
+    #     """ create a button in the admin for users to copy a specific embed code """
+    #     # embed_code = obj.embed_code
+    #     embed_code = 'test copy text'
+    #     script = '<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script><script>var clipboard=new Clipboard(".copyCode",{{text: function(){{return "{code}";}}}});</script>'.format(code=embed_code)
+    #     # <script>$(function(){{$(".copyCode").click(function(){{ var temp=$(".copyCode"); $("body").append(temp); temp.val("' + embed_code + '").select(); document.execCommand("copy")}}); }});</script>
+    #     button = format_html(script + '<a class="button copyCode" href="#">Copy embed code</a>')
+    #     return button
 
     def documentcloud_url_formatted(self, obj):
         """ display the DocumentCloud URL as a clickable link in the admin"""
         link = '-'
         if obj.documentcloud_id:
-            link = format_html('<a href="{}">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
+            link = format_html('<a class="button" href="{}">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
         return link
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
@@ -40,11 +49,6 @@ class DocumentAdmin(admin.ModelAdmin):
             return qs
         else:
             return qs.filter(uploaded_by=request.user)
-
-    # def copy_embed_code(self, obj):
-        """ create a button in the admin for users to copy a specific embed code """
-        return 
-
 
     def generate_embed_codes(self, request, queryset):
         """ add admin action to generate document embed code list for user """
