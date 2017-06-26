@@ -129,12 +129,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-# python social auth
+# Python social auth 
 AUTHENTICATION_BACKENDS = (
-   # 'social.backends.facebook.FacebookOAuth2',
-   'social.backends.google.GoogleOAuth2',
-   # 'social.backends.twitter.TwitterOAuth',
-   'django.contrib.auth.backends.ModelBackend',
+    # 'social.backends.twitter.TwitterOAuth',
+    # 'social.backends.facebook.FacebookOAuth2',
+    'social.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/admin'
+
+# list of domains to whitelist
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ['beaufortgazette.com', 'bellinghamherald.com', 'bnd.com', 'bradenton.com', 'centredaily.com', 'charlotteobserver.com', 'elnuevoherald.com', 'fresnobee.com', 'idahostatesman.com', 'islandpacket.com', 'kansas.com', 'kansascity.com', 'kcstar.com', 'kentucky.com', 'ledger-enquirer.com', 'macon.com', 'mercedsun-star.com', 'miamiherald.com', 'modbee.com', 'myrtlebeachonline.com', 'heraldonline.com', 'newsobserver.com', 'sacbee.com', 'sanluisobispo.com', 'star-telegram.com', 'sunherald.com', 'thenewstribune.com', 'theolympian.com', 'thestate.com', 'thesunnews.com', 'tri-cityherald.com', 'tricityherald.com', 'thetribunenews.com', 'wichitaeagle.com', 'chapelhillnews.com', 'charlotte.com', 'easternwakenews.com', 'thedurhamnews.com', 'theherald-nc.com', 'carynews.com', 'mcclatchydc.com', 'mcclatchy.com', 'heraldsun.com']
