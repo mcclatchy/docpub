@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'docpub.urls'
@@ -71,6 +72,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social.apps.django_app.context_processors.backends',
                 'social.apps.django_app.context_processors.login_redirect',
+                # 'social_django.context_processors.backends',
+                # 'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -139,5 +142,3 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = '/admin'
 
-# list of domains to whitelist
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ['beaufortgazette.com', 'bellinghamherald.com', 'bnd.com', 'bradenton.com', 'centredaily.com', 'charlotteobserver.com', 'elnuevoherald.com', 'fresnobee.com', 'idahostatesman.com', 'islandpacket.com', 'kansas.com', 'kansascity.com', 'kcstar.com', 'kentucky.com', 'ledger-enquirer.com', 'macon.com', 'mercedsun-star.com', 'miamiherald.com', 'modbee.com', 'myrtlebeachonline.com', 'heraldonline.com', 'newsobserver.com', 'sacbee.com', 'sanluisobispo.com', 'star-telegram.com', 'sunherald.com', 'thenewstribune.com', 'theolympian.com', 'thestate.com', 'thesunnews.com', 'tri-cityherald.com', 'tricityherald.com', 'thetribunenews.com', 'wichitaeagle.com', 'chapelhillnews.com', 'charlotte.com', 'easternwakenews.com', 'thedurhamnews.com', 'theherald-nc.com', 'carynews.com', 'mcclatchydc.com', 'mcclatchy.com', 'heraldsun.com']
