@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.utils.html import format_html
 # from django.contrib import messages
 from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY
-from .models import Document, DocumentCloudCredentials
+from .models import Document, DocumentCloudCredentials, DocumentSet
 from docs.connection import connection
 from docs.forms import PasswordInline
 
@@ -118,6 +118,32 @@ class UserAdmin(BaseUserAdmin):
     inlines = (UserInline,)
 
 
+class DocumentSetInline(admin.StackedInline):
+    model = Document
+    fieldsets = (
+        (None, {
+            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code', 'documentcloud_url') #'project', 'copy_embed_code', 'documentcloud_url_formatted'
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('secure', 'sidebar', 'related_article')
+        })
+    )
+    ## for admin.TabularInline
+    # fields = ('access', 'title', ('file', 'link',), 'source', 'documentcloud_url',) # 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code')
+    readonly_fields = ('documentcloud_url',)
+    show_change_link = True
+    extra = 1
+    # classes = ['collapse'] ## collapses the entire set of inlines
+
+
+class DocumentSetAdmin(admin.ModelAdmin):
+    fields = ('name',)
+    list_display = ('name', 'created',)
+    list_filter = ('created',)
+    search_fields = ('name',)
+    inlines = (DocumentSetInline,)
+
 ## TEMPLATE
 # class Admin(admin.ModelAdmin):
 #     fields = ('')
@@ -131,6 +157,7 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(Document, DocumentAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+admin.site.register(DocumentSet, DocumentSetAdmin)
 # admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
 ## TEMPLATE
 # admin.site.register(, )

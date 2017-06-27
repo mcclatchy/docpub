@@ -28,9 +28,21 @@ class BasicInfo(models.Model):
         abstract = True
 
 
+class DocumentSet(BasicInfo):
+    name = models.CharField(max_length=255, null=True, blank=False)
+
+    class Meta:
+        ordering = ['-created']
+        verbose_name = 'Document set'
+
+    def __str__(self):
+        return self.name
+
+
 class Document(BasicInfo):
     access = models.CharField(max_length=255, null=True, choices=ACCESS_CHOICES, verbose_name='Who can see this?', help_text='Should the document be publicly visible or only visible to other users in your DocumentCloud organization?')
     description = models.TextField(blank=True, null=True, help_text='Optional (but strongly encouraged) description of the document. <strong>PUBLIC</strong>')
+    document_set = models.ForeignKey(DocumentSet, null=True, blank=True)
     documentcloud_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud ID', help_text='ID of the document on DocumentCloud')
     documentcloud_pdf_url = models.URLField(max_length=255, blank=True, null=True, verbose_name='PDF hosted by DocumentCloud', help_text='Automatically pulled from DocumentCloud after document finishes processing.')
     # documentcloud_thumbnail = models.URLField(max_length=255, blank=True, null=True, verbose_name='Document thumbail', help_text='Pulled from DocumentCloud after document finishes processing.')
@@ -172,5 +184,4 @@ class DocumentCloudCredentials(BasicInfo):
 
     def __str__(self):
         return self.user.email
-
 
