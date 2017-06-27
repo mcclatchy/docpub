@@ -10,3 +10,4 @@ class PasswordInline(ModelForm):
         widgets = {
             'password': PasswordInput(render_value=True),
         }
+
