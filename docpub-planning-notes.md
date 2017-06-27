@@ -49,10 +49,6 @@
 
 * TK: use admin inlines for batch upload?
 
-* PUNT: create bookmarklet that can grab a PDF open in your browser?
-	* enable post API and/or just pre-populate Django admin?
-	* e.g. [domain]/admin/docs/document/add/?link=URL
-
 * IN PROGRESS: click to copy the embed code in the admin:
 	* e.g. https://codepen.io/shaikmaqsood/pen/XmydxJ/
 
@@ -64,6 +60,10 @@
 * PUNT: drag-and-drop interface for the form? initially it will just be a standard "click and choose"
 	* try jQuery File Upload; basic seems best https://blueimp.github.io/jQuery-File-Upload/basic.html
 	* also check out this Django implementation https://github.com/sigurdga/django-jquery-file-upload
+
+* PUNT: create bookmarklet that can grab a PDF open in your browser?
+	* enable post API and/or just pre-populate Django admin?
+	* e.g. [domain]/admin/docs/document/add/?link=URL
 
 * PUNT: use Google Drive or Issuu for first pass?
 	* https://developers.google.com/drive/v3/web/quickstart/python
