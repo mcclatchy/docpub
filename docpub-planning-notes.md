@@ -33,7 +33,8 @@
 
 * COMPLETE: doccloud creds in django user; if not, then use master account 
 	
-* TK: Only show logged in user the files they -- or their org? -- have uploaded?
+* COMPLETE: Only show logged in user the files they have uploaded?
+	* Q: worth filtering by the org, when present?
 
 * COMPLETE: workflow
 	* add / edit
@@ -42,14 +43,20 @@
 
 * Q: require everyone to have their own DocCloud.org account to use the tool?
 
+* TK: include newsroom name as field for extended user so we can filter in User admin list view
+
 * TK: media queries: 400 or 450 for phone, 600 for desktop (suggestion via Nathaniel)
 
-* PUNT: create bookmarklet that can grab a PDF open in your browser?
+* TK: use admin inlines for batch upload?
 
-* TK: click to copy the embed code in the admin:
+* PUNT: create bookmarklet that can grab a PDF open in your browser?
+	* enable post API and/or just pre-populate Django admin?
+	* e.g. [domain]/admin/docs/document/add/?link=URL
+
+* IN PROGRESS: click to copy the embed code in the admin:
 	* e.g. https://codepen.io/shaikmaqsood/pen/XmydxJ/
 
-* TK: use Google oauth for login?
+* IN PROGRESS: use Google oauth for login?
 	* https://developers.google.com/api-client-library/python/start/get_started
 	* https://developers.google.com/api-client-library/python/guide/django
 	* https://artandlogic.com/2014/04/tutorial-adding-facebooktwittergoogle-authentication-to-a-django-application/
