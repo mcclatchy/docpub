@@ -86,8 +86,8 @@ class DocumentAdmin(admin.ModelAdmin):
 
         ## choose which DocumentCloud.org creds to use
         documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
-        documentcloud_password = documentcloud_login[0].password
-        if documentcloud_password:
+        if documentcloud_login.count() == 1:
+            documentcloud_password = documentcloud_login[0].password
             client = connection(email_address, documentcloud_password)
             ## if this fails, need a way to notify user that their creds are wrong; and/or fallback to shared account?
         else:
