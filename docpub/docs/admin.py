@@ -27,9 +27,12 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def copy_embed_code(self, obj):
         """ create a button in the admin for users to copy a specific embed code """
-        embed_code = obj.embed_code
-        html = '<a class=\'button copyCode\' data-clipboard-action=\'copy\' data-clipboard-text=\'{code}\' href=\'#\' onclick=\'copy(); return false;\'>Copy embed code</a>'.format(code=embed_code)
-        button = format_html(html)
+        if obj.created:
+            embed_code = obj.embed_code
+            html = '<a class=\'button copyCode\' data-clipboard-action=\'copy\' data-clipboard-text=\'{code}\' href=\'#\' onclick=\'copy(); return false;\'>Copy embed code</a>'.format(code=embed_code)
+            button = format_html(html)
+        else:
+            button = '-'
         return button
 
     def documentcloud_url_formatted(self, obj):
