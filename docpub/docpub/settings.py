@@ -22,7 +22,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if docpubenv != 'prod':
+    DEBUG = True
+else:
+    DEBUG = False
 
 # ALLOWED_HOSTS = [] ## imported from private
 INTERNAL_IPS = ['127.0.0.1']
