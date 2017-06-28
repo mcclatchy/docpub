@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from docpub.settings import UPLOAD_PATH
+from docpub.settings import UPLOAD_PATH, EMBED_CSS
 from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
 
 
@@ -154,12 +154,11 @@ class Document(BasicInfo):
         """ generate the embed code """
         doc_id = self.documentcloud_id
         doc_sidebar = str(self.sidebar).lower()
-        style_embed = ''
-        # style_embed = '<style>@media (max-width: 420px) iframe {height: 500px;}</style>' ## switch to external stylesheet?
-        iframe_embed = '<div><iframe src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}" style="border:none;width:100%;height:500px"></iframe></div>'.format(
+        style_embed = '<link rel="stylesheet" type="text/css" href="{css}">'.format(css=EMBED_CSS)
+        iframe_embed = '<div><iframe class="docpubEmbed" src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}"></iframe></div>'.format(
                 id=doc_id,
                 sidebar=doc_sidebar
-            ) # desktop height 930px, mobile height 500px
+            ) # style="border:none;width:100%;height:500px" # desktop height 930px, mobile height 500px
         self.embed_code = style_embed + iframe_embed
 
 ## in save method? post save? for text, etc -- anything else that wouldn't initially be available
