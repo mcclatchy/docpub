@@ -85,19 +85,37 @@ class DocumentAdmin(admin.ModelAdmin):
             else:
                 obj.newsroom = '%s (unspecified)' % (company)
 
-        ## choose which DocumentCloud.org creds to use
         documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
+        ## determine if password exists
         if documentcloud_login.count() == 1:
-            documentcloud_password = documentcloud_login[0].password
-            client = connection(email_address, documentcloud_password)
-            ## if this fails, need a way to notify user that their creds are wrong; and/or fallback to shared account?
-            if not obj.created:
-                obj.account = 'Your account'
+            password_exists = True
         else:
-            client = connection(DC_USERNAME, DC_PASSWORD)
-            if not obj.created:
-                obj.account = 'Shared account'
-        if obj.updated: # and obj.uploaded_by == user: ## make this work
+            password_exists = False
+        ## choose which DocumentCloud.org creds to use
+        if not obj.created:
+            ## upload to individual account
+            if password_exists:
+                documentcloud_password = documentcloud_login[0].password
+                client = connection(email_address, documentcloud_password)
+                ## if this fails, need a way to notify user that their creds are wrong; and/or fallback to shared account?
+                if not obj.created:
+                    obj.account = 'Your account'
+            ## upload to shared account
+            else:
+                client = connection(DC_USERNAME, DC_PASSWORD)
+                if not obj.created:
+                    obj.account = 'Shared account'
+        else:
+            ## upload to shared account
+            if obj.account == 'Shared account' and password_exists:
+                client = connection(DC_USERNAME, DC_PASSWORD)
+            ## upload to individual account
+            else:
+                documentcloud_password = documentcloud_login[0].password
+                client = connection(email_address, documentcloud_password)
+
+        ## determine whether to create or update
+        if obj.updated:
             obj.document_update(client)
         else:
             obj.document_upload(client)
