@@ -36,9 +36,11 @@
 
 * Q: require everyone to have their own DocCloud.org account to use the tool?
 
+* Q: filter admin by newsroom or individual? currently individual
+
 * TK: include newsroom name as field for extended user so we can filter in User admin list view
 
-* TK: media queries: 400 or 450 for phone, 600 for desktop (suggestion via Nathaniel)
+* COMPLETED: media queries for iframe embed
 
 * IN PROGRESS: use Google oauth for login?
 	* https://developers.google.com/api-client-library/python/start/get_started
@@ -62,6 +64,6 @@
 
 * UNNECESSARY: file storage
 	* S3? https://github.com/bradleyg/django-s3direct
-	* do we even need to store the PDF or can we just stream it?
+	* do we even need to store the PDF or can we just stream it? need to store it
 
 * Q: delete PDF after uploaded to avoid excess storage costs?
