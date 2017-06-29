@@ -146,6 +146,7 @@ class UserInline(admin.StackedInline):
     # can_delete = False
     # verbose_name_plural = 'Login'
 
+
 class UserAdmin(BaseUserAdmin):
     inlines = (UserInline,)
 
