@@ -183,5 +183,5 @@ class DocumentCloudCredentials(BasicInfo):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.user.email
+        return self.user.username
 
