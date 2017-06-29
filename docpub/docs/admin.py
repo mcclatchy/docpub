@@ -40,7 +40,7 @@ class DocumentAdmin(admin.ModelAdmin):
         """ display the DocumentCloud URL as a clickable link in the admin"""
         link = 'Click "Save" again on this doc'
         if obj.documentcloud_id:
-            link = format_html('<a class="button" href="{}">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
+            link = format_html('<a class="button" href="{}" target="_blank">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
         return link
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
