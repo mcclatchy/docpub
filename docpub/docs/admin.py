@@ -86,8 +86,8 @@ class DocumentAdmin(admin.ModelAdmin):
                 obj.newsroom = '%s (unspecified)' % (company)
 
         ## determine if password exists
-        documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
-        if documentcloud_login.count() == 1:
+        documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)[0]
+        if documentcloud_login.password:
             password_exists = True
         else:
             password_exists = False
@@ -106,13 +106,15 @@ class DocumentAdmin(admin.ModelAdmin):
         else:
             if obj.account == 'Shared account' and password_exists:
                 shared = True
+            # elif obj.account == 'Your account' and not password_exists:
+            #     # alert user that they need to re-enter their password
             else:
                 individual = True
 
         ## set the DocumentCloud.org client
         if individual:
             email = email_address
-            password = documentcloud_login[0].password
+            password = documentcloud_login.password
         else: 
             email = DC_USERNAME
             password = DC_PASSWORD
