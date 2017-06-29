@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
-# from django.contrib import messages
+from django.contrib import messages
 from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY
 from .models import Document, DocumentCloudCredentials, DocumentSet
 from docs.connection import connection
@@ -106,8 +106,9 @@ class DocumentAdmin(admin.ModelAdmin):
         else:
             if obj.account == 'Shared account' and password_exists:
                 shared = True
-            # elif obj.account == 'Your account' and not password_exists:
-            #     # alert user that they need to re-enter their password
+            elif obj.account == 'Your account' and not password_exists:
+                message = format_html('You need to re-enter your DocumentCloud password <a href="/admin/auth/user/{}/change/#documentcloudcredentials-0">here</a>.'.format(user.id))
+                messages.error(request, message)
             else:
                 individual = True
 
@@ -119,14 +120,17 @@ class DocumentAdmin(admin.ModelAdmin):
             email = DC_USERNAME
             password = DC_PASSWORD
 
-        client = connection(email, password)
-        ## if client fails, need a way to notify user that their individual creds are wrong; and/or fallback to shared account?
+        try:
+            client = connection(email, password)
 
-        ## determine whether to create or update
-        if obj.updated:
-            obj.document_update(client)
-        else:
-            obj.document_upload(client)
+            ## determine whether to create or update
+            if obj.updated:
+                obj.document_update(client)
+            else:
+                obj.document_upload(client)
+        except:
+            message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password <a href="/admin/auth/user/{}/change/#documentcloudcredentials-0">here</a>.'.format(user.id))
+            messages.error(request, message)
 
         ## generate the embed
         obj.generate_embed()
