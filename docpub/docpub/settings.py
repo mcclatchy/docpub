@@ -73,10 +73,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'social.apps.django_app.context_processors.backends',
-                'social.apps.django_app.context_processors.login_redirect',
-                # 'social_django.context_processors.backends',
-                # 'social_django.context_processors.login_redirect',
+                # 'social.apps.django_app.context_processors.backends',
+                # 'social.apps.django_app.context_processors.login_redirect',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -139,9 +139,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 AUTHENTICATION_BACKENDS = (
     # 'social.backends.twitter.TwitterOAuth',
     # 'social.backends.facebook.FacebookOAuth2',
-    'social.backends.google.GoogleOAuth2',
+    # 'social.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
-
-LOGIN_REDIRECT_URL = '/admin'
 
