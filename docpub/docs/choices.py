@@ -14,6 +14,7 @@ NEWSROOM_CHOICES = (
     ('bradenton.com', 'Bradenton Herald'),
     ('centredaily.com', 'Centre Daily Times'),
     ('charlotteobserver.com', 'Charlotte Observer'),
+    ('heraldsun.com', 'Durham Herald Sun'),
     ('elnuevoherald.com', 'El Nuevo Herald'),
     ('fresnobee.com', 'Fresno Bee'),
     ('idahostatesman.com', 'Idaho Statesman'),
@@ -45,7 +46,6 @@ NEWSROOM_CHOICES = (
     ('carynews.com', 'Cary News'),
     ('mcclatchydc.com', 'McClatchy DC'),
     ('mcclatchy.com', 'McClatchy'),
-    ('heraldsun.com', 'Durham Herald Sun')
 )
 
 # NEWSROOM_DOMAIN_MAPPING = {
