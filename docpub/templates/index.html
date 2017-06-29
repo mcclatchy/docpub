@@ -2,13 +2,19 @@
 
 {% block main %}
  <div>
- <h1>Login</h1>
+ <h1>Welcome to DocPub!</h1>
 
  <p>
    <ul>
    {% if user and not user.is_anonymous %}
      <li>
-       <a>Hello {{ user.get_full_name|default:user.username }}!</a>
+       <a>Hello, {{ user.get_full_name|default:user.username }}!</a>
+     </li>
+     <li>
+      <a href="/admin/docs/document">View your documents</a>
+     </li>
+     <li>
+      <a href="/admin/auth/user/{{user.id}}/change/">Edit your profile</a> (and <a href="/admin/auth/user/{{user.id}}/change/#documentcloudcredentials-0">add your DocumentCloud.org password here</a>)
      </li>
      <li>
        <a href="{% url 'auth:logout' %}?next={{ request.path }}">Logout</a>
@@ -18,7 +24,7 @@
        <a href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">Login with Facebook</a>
      </li> -->
      <li>
-       <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ LOGIN_REDIRECT_URL }}">Login with Google</a>
+       <a href="{% url 'social:begin' 'google-oauth2' %}?next=/">Login with Google</a>
      </li>
      <!-- <li>
        <a href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">Login with Twitter</a>

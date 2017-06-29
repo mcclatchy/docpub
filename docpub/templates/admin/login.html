@@ -61,11 +61,11 @@
       <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
     </div>
   </form>
-  <!-- <br>
+  <br>
   <hr>
   <br>
   <div style="text-align: center;">
-    <a class="button" href="{% url 'social:begin' 'google-oauth2' %}">Log in with work Gmail</a>
-  </div> -->
+    <a class="button" href="{% url 'social:begin' 'google-oauth2' %}?next=/admin/docs/document">Log in with work Gmail</a>
+  </div>
 </div>
 {% endblock %}
