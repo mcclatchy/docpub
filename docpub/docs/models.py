@@ -41,6 +41,7 @@ class DocumentSet(BasicInfo):
 
 class Document(BasicInfo):
     access = models.CharField(max_length=255, null=True, choices=ACCESS_CHOICES, verbose_name='Who can see this?', help_text='Should the document be publicly visible or only visible to other users in your DocumentCloud organization?')
+    account = models.CharField(max_length=100, null=True, blank=True, verbose_name='Who owns this doc?', help_text='This can\'t be changed')
     description = models.TextField(blank=True, null=True, help_text='Optional (but strongly encouraged) description of the document. <strong>PUBLIC</strong>')
     document_set = models.ForeignKey(DocumentSet, null=True, blank=True)
     documentcloud_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud ID', help_text='ID of the document on DocumentCloud')

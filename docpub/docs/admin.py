@@ -16,13 +16,14 @@ class DocumentAdmin(admin.ModelAdmin):
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('secure', 'sidebar', 'related_article')
+            'fields': ('secure', 'sidebar', 'related_article','account',)
         })
     )
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
     list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted', 'copy_embed_code',)
+    list_editable = ('access',)
     list_filter = ('access',) # 'project', 'updated', 'created',
-    readonly_fields = ('embed_code', 'documentcloud_url_formatted', 'copy_embed_code') # 'documentcloud_id', 'uploaded_by'
+    readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code') # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
 
     def copy_embed_code(self, obj):
@@ -37,7 +38,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def documentcloud_url_formatted(self, obj):
         """ display the DocumentCloud URL as a clickable link in the admin"""
-        link = '-'
+        link = 'Click "Save" again on this doc'
         if obj.documentcloud_id:
             link = format_html('<a class="button" href="{}">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
         return link
@@ -90,8 +91,12 @@ class DocumentAdmin(admin.ModelAdmin):
             documentcloud_password = documentcloud_login[0].password
             client = connection(email_address, documentcloud_password)
             ## if this fails, need a way to notify user that their creds are wrong; and/or fallback to shared account?
+            if not obj.created:
+                obj.account = 'Your account'
         else:
             client = connection(DC_USERNAME, DC_PASSWORD)
+            if not obj.created:
+                obj.account = 'Shared account'
         if obj.updated: # and obj.uploaded_by == user: ## make this work
             obj.document_update(client)
         else:
