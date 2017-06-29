@@ -282,7 +282,6 @@ Enable uwsgi and nginx to run on startup
 	sudo systemctl enable nginx
 	sudo systemctl enable uwsgi
 
-
 # Google oauth
 
 ## Instructions
