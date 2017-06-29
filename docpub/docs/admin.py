@@ -99,12 +99,10 @@ class DocumentAdmin(admin.ModelAdmin):
         if not obj.created:
             if password_exists:
                 individual = True
-                if not obj.created:
-                    obj.account = 'Your account'
+                obj.account = 'Your account'
             else:
-                shared = True
-                if not obj.created:
-                    obj.account = 'Shared account'
+                shared = True   
+                obj.account = 'Shared account'
         else:
             if obj.account == 'Shared account' and password_exists:
                 shared = True
