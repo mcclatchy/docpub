@@ -96,6 +96,8 @@ class DocumentAdmin(admin.ModelAdmin):
         shared = False
         individual = False
 
+        user_change_link = '<a href="/admin/auth/user/{}/change/#documentcloudcredentials-0" target="_blank">here</a>.'.format(user.id)
+
         if not obj.created:
             if password_exists:
                 individual = True
@@ -107,7 +109,7 @@ class DocumentAdmin(admin.ModelAdmin):
             if obj.account == 'Shared account' and password_exists:
                 shared = True
             elif obj.account == 'Your account' and not password_exists:
-                message = format_html('You need to re-enter your DocumentCloud password <a href="/admin/auth/user/{}/change/#documentcloudcredentials-0">here</a>.'.format(user.id))
+                message = format_html('You need to re-enter your DocumentCloud password ' + user_change_link)
                 messages.error(request, message)
             else:
                 individual = True
@@ -129,7 +131,7 @@ class DocumentAdmin(admin.ModelAdmin):
             else:
                 obj.document_upload(client)
         except:
-            message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password <a href="/admin/auth/user/{}/change/#documentcloudcredentials-0">here</a>.'.format(user.id))
+            message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password ' + user_change_link)
             messages.error(request, message)
 
         ## generate the embed
