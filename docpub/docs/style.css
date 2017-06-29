@@ -1,4 +1,17 @@
 .docpubEmbed {
-	width: 100%;
-	border: none;
+  border: none;
+  width: 100%;
+  height: 800px;
+}
+
+@media (max-width: 500px) {
+  .docpubEmbed {
+    height: 650px;
+  }
+}
+
+@media (max-width: 400px) {
+  .docpubEmbed {
+    height: 550px;
+  }
 }
