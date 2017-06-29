@@ -62,7 +62,7 @@ class DocumentAdmin(admin.ModelAdmin):
     generate_embed_codes.short_description = 'Get embed codes for selected documents'
 
     def save_model(self, request, obj, form, change):
-        """ save/add to DocumentCloud.org """
+        """ save/update document on DocumentCloud.org """
         user = request.user
         email_address = user.email
 
@@ -85,34 +85,42 @@ class DocumentAdmin(admin.ModelAdmin):
             else:
                 obj.newsroom = '%s (unspecified)' % (company)
 
-        documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
         ## determine if password exists
+        documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)
         if documentcloud_login.count() == 1:
             password_exists = True
         else:
             password_exists = False
+
         ## choose which DocumentCloud.org creds to use
+        shared = False
+        individual = False
+
         if not obj.created:
-            ## upload to individual account
             if password_exists:
-                documentcloud_password = documentcloud_login[0].password
-                client = connection(email_address, documentcloud_password)
-                ## if this fails, need a way to notify user that their creds are wrong; and/or fallback to shared account?
+                individual = True
                 if not obj.created:
                     obj.account = 'Your account'
-            ## upload to shared account
             else:
-                client = connection(DC_USERNAME, DC_PASSWORD)
+                shared = True
                 if not obj.created:
                     obj.account = 'Shared account'
         else:
-            ## upload to shared account
             if obj.account == 'Shared account' and password_exists:
-                client = connection(DC_USERNAME, DC_PASSWORD)
-            ## upload to individual account
+                shared = True
             else:
-                documentcloud_password = documentcloud_login[0].password
-                client = connection(email_address, documentcloud_password)
+                individual = True
+
+        ## set the DocumentCloud.org client
+        if individual:
+            email = email_address
+            password = documentcloud_login[0].password
+        else: 
+            email = DC_USERNAME
+            password = DC_PASSWORD
+
+        client = connection(email, password)
+        ## if client fails, need a way to notify user that their individual creds are wrong; and/or fallback to shared account?
 
         ## determine whether to create or update
         if obj.updated:
