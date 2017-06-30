@@ -50,7 +50,7 @@ class DocumentAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         else:
-            return qs.filter(uploaded_by=request.user)
+            return qs.filter(user=request.user)
 
     def generate_embed_codes(self, request, queryset):
         """ add admin action to generate document embed code list for user """
@@ -62,9 +62,12 @@ class DocumentAdmin(admin.ModelAdmin):
     generate_embed_codes.short_description = 'Get embed codes for selected documents'
 
     def save_model(self, request, obj, form, change):
-        """ save/update document on DocumentCloud.org """
+        """ save/update document on DocumentCloud.org and related Document model fields """
         user = request.user
         email_address = user.email
+
+        ## populate user FK on model
+        obj.user = user
 
         ## populate uploaded_by and newsroom
         fullname = user.get_full_name()
@@ -83,7 +86,7 @@ class DocumentAdmin(admin.ModelAdmin):
             if email_address:
                 obj.newsroom = email_split[1]
             else:
-                obj.newsroom = '%s (unspecified)' % (company)
+                obj.newsroom = '%s (unspecified)' % (COMPANY)
 
         ## determine if password exists
         documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)[0]

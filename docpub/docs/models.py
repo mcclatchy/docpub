@@ -64,6 +64,7 @@ class Document(BasicInfo):
     text = models.TextField(null=True, blank=True, verbose_name='Document text', help_text='Text of the PDF extracted by DocumentCloud. Leave this blank when you first upload the document. It will be filled in automatically. If the plain text does not appear after initially creating/saving here, check on DocumentCloud.org to see if the document is finished processing. When it is done, come back here and click "Save and continue editing" below, then verify the text is filled in here. If you would like, you can clean up the text as needed after it appears here. At any point in the process, the plain text will not be overwritten if there is any text here -- original or modified.')
     title = models.CharField(max_length=255, blank=False, null=True, help_text='Short yet descriptive title (e.g. 2017 House budget proposal). <strong>PUBLIC</strong>')
     uploaded_by = models.CharField(max_length=255, null=True, blank=True, help_text='If left blank, it will grab the first part of your email address (specifically, everything before the @ symbol).')
+    user = models.ForeignKey(User, null=True, blank=True)
 
     class Meta:
         ordering = ['-created'] # updated might get confusing, but could be more helpful
