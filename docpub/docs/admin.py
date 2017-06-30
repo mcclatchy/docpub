@@ -16,14 +16,14 @@ class DocumentAdmin(admin.ModelAdmin):
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('secure', 'sidebar', 'related_article','account',)
+            'fields': ('secure', 'sidebar', 'related_article', 'user',)
         })
     )
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
     list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted', 'copy_embed_code',)
     list_editable = ('access',)
     list_filter = ('access',) # 'project', 'updated', 'created',
-    readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code') # 'documentcloud_id', 'uploaded_by'
+    readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user',) # 'documentcloud_id', 'uploaded_by'
     actions = ('generate_embed_codes')
 
     def copy_embed_code(self, obj):
@@ -67,7 +67,8 @@ class DocumentAdmin(admin.ModelAdmin):
         email_address = user.email
 
         ## populate user FK on model
-        obj.user = user
+        if not obj.created:
+            obj.user = user
 
         ## populate uploaded_by and newsroom
         fullname = user.get_full_name()
