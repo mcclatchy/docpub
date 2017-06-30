@@ -24,6 +24,12 @@
 * TK: make sure Google oauth works with existing accounts that use the auth'ed domains
 	* it seemed to work locally, but not on prod
 
+* TK: handle if someone creates a document with no credentials; currently it creates, but then they couldn't create later bc of obj.created condition so we need to prevent save from firing
+
+* TK: prevent both error messages from appearing? in the case of no password after a doc was previously uploaded, it throws both "re-enter" and "credentials failed" errors, which are redundant
+
+* TK: check user password on save in User admin, which would help fix issue above and make things better
+
 * Q: require everyone to have their own DocCloud.org account to use the tool? 
 
 * Q: set a shared account in the admin so indidivual newsrooms can do their own shared accounts vs just using DC bureau's?
