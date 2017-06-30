@@ -286,19 +286,19 @@ Enable uwsgi and nginx to run on startup
 
 ## Instructions
 
-Follow these directions from [Art and Logic](https://artandlogic.com/2014/04/tutorial-adding-facebooktwittergoogle-authentication-to-a-django-application/)
+Follow steps in official documentation
 
-## Fixes
+	https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
 
-* install social django (bc it was missing)
+## Additional steps
 
 * enable Google+ API (necessary?)
 
-* migration fix ([via StackOverflow](https://stackoverflow.com/a/42946678/217955))
+## Migration fix 
 
-The problem is, python-social-auth is deprecated as of December 2016.
+([via StackOverflow](https://stackoverflow.com/a/42946678/217955))
 
-Migrating existing projects
+``` Migrating existing projects
 
 According to the migration instructions here:
 
@@ -314,4 +314,4 @@ pip install python-social-auth==0.2.21
 pip install social-auth-app-django
 Set Django's app list and the backend-related settings according to the settings paragraph of the migration page.
 Apply migrations: python manage.py migrate
-Uninstall the old package: pip uninstall python-social-auth
+Uninstall the old package: pip uninstall python-social-auth ```
