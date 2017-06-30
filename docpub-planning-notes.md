@@ -1,22 +1,4 @@
-*FIELDS*
-
-
-***publishing info***
-* email me when finished (TK?)
-* schedule publish (TK?)
-
-*EMBED CODE*
-* one-click button to copy and/or click within the field to select-all automatically
-	* https://codepen.io/shaikmaqsood/pen/XmydxJ/
-* how to handle for mobile apps? just construct iframe embed from DocumentCloud html version
-	* generate upload html file with embed code to S3 and provide iframe?
-	* pre-fix code to control display
-		* leave as is on desktop
-		* hide script embed and link directly to doc viewer on apps? check for jquery?
-	* generic PDF or `thumbnail_image_url` icon to open in-app browser?
-		* having issues with this; will we need to grab and host on S3?
-
-*NOTES*
+*To-do list*
 * COMPLETED: for admin fields, note which are displayed publicly 
 
 * COMPLETED: doccloud creds in django user; if not, then use master account 
@@ -34,18 +16,25 @@
 * COMPLETED: click to copy the embed code in the admin:
 	* e.g. https://codepen.io/shaikmaqsood/pen/XmydxJ/
 
-* Q: require everyone to have their own DocCloud.org account to use the tool?
+* COMPLETED: media queries for iframe embed
+
+* COMPLETED: use Google oauth for login
+	* https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
+
+* TK: make sure Google oauth works with existing accounts that use the auth'ed domains
+	* it seemed to work locally, but not on prod
+
+* Q: require everyone to have their own DocCloud.org account to use the tool? 
+
+* Q: set a shared account in the admin so indidivual newsrooms can do their own shared accounts vs just using DC bureau's?
 
 * Q: filter admin by newsroom or individual? currently individual
 
 * TK: include newsroom name as field for extended user so we can filter in User admin list view
 
-* COMPLETED: media queries for iframe embed
+* Q: email me when finished?
 
-* IN PROGRESS: use Google oauth for login?
-	* https://developers.google.com/api-client-library/python/start/get_started
-	* https://developers.google.com/api-client-library/python/guide/django
-	* https://artandlogic.com/2014/04/tutorial-adding-facebooktwittergoogle-authentication-to-a-django-application/
+* Q: schedule publish?
 
 * PUNT: drag-and-drop interface for the form? initially it will just be a standard "click and choose"
 	* try jQuery File Upload; basic seems best https://blueimp.github.io/jQuery-File-Upload/basic.html
