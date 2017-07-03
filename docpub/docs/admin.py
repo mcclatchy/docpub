@@ -41,7 +41,7 @@ class DocumentAdmin(admin.ModelAdmin):
         if obj.documentcloud_id:
             link = format_html('<a class="button" href="{}" target="_blank">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
         elif obj.file or obj.link:
-            link = 'Click "Save" again on this doc'
+            link = 'Click "Save" again on this doc, or make sure your DocumentCloud credentials are entered and correct'
         else:
             link = 'Upload or link to a PDF, then hit "Save" below.'
         return link
