@@ -40,12 +40,26 @@ Create a private settings file
 
 	vim ~/path/to/docpub/docpub/settings_private.py
 
-Add your Django secret key and DocumentCloud credentials
+Add the following
 
+	# Django settings
 	SECRET_KEY = ''
 	ALLOWED_HOSTS = ['']
+
+	# shared DocumentCloud credentials
 	DC_USERNAME = ''
 	DC_PASSWORD = ''
+
+	# docpub settings
+	DOCPUBENV = ''
+	COMPANY = ''
+	EMBED_CSS = ''
+
+	# social auth (optional)
+	SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
+	SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
+	SOCIAL_AUTH_PASSWORDLESS = True
+	SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ['']
 
 # Local server
 
