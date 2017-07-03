@@ -28,7 +28,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def copy_embed_code(self, obj):
         """ create a button in the admin for users to copy a specific embed code """
-        if obj.created:
+        if obj.documentcloud_id:
             embed_code = obj.embed_code
             html = '<a class=\'button copyCode\' data-clipboard-action=\'copy\' data-clipboard-text=\'{code}\' href=\'#\' onclick=\'copy(); return false;\'>Copy embed code</a>'.format(code=embed_code)
             button = format_html(html)
@@ -38,19 +38,14 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def documentcloud_url_formatted(self, obj):
         """ display the DocumentCloud URL as a clickable link in the admin"""
-        link = 'Click "Save" again on this doc'
         if obj.documentcloud_id:
             link = format_html('<a class="button" href="{}" target="_blank">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
+        elif obj.file or obj.link:
+            link = 'Click "Save" again on this doc'
+        else:
+            link = 'Upload or link to a PDF, then hit "Save" below.'
         return link
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
-
-    def get_queryset(self, request):
-        """ only show the current users docs """
-        qs = super(DocumentAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        else:
-            return qs.filter(user=request.user)
 
     def generate_embed_codes(self, request, queryset):
         """ add admin action to generate document embed code list for user """
@@ -60,6 +55,14 @@ class DocumentAdmin(admin.ModelAdmin):
             # message.append(race.embed_code)
         self.message_user(request, '%s' % message)
     generate_embed_codes.short_description = 'Get embed codes for selected documents'
+
+    def get_queryset(self, request):
+        """ only show the current users docs """
+        qs = super(DocumentAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=request.user)
 
     def save_model(self, request, obj, form, change):
         """ save/update document on DocumentCloud.org and related Document model fields """
@@ -130,7 +133,7 @@ class DocumentAdmin(admin.ModelAdmin):
             client = connection(email, password)
 
             ## determine whether to create or update
-            if obj.updated:
+            if obj.documentcloud_id:
                 obj.document_update(client)
             else:
                 obj.document_upload(client)
@@ -139,7 +142,8 @@ class DocumentAdmin(admin.ModelAdmin):
             messages.error(request, message)
 
         ## generate the embed
-        obj.generate_embed()
+        if obj.documentcloud_id:
+            obj.generate_embed()
 
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
