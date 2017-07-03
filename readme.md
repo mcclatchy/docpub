@@ -137,12 +137,7 @@ Create a private settings file
 
 	vim ~/docpub/docpub/docpub/settings_private.py
 
-Add your Django secret key and DocumentCloud credentials
-
-	SECRET_KEY = ''
-	ALLOWED_HOSTS = ['']
-	DC_USERNAME = ''
-	DC_PASSWORD = ''
+Add the same settings as you did locally (see above).
 
 Initial migration for admin tables
 
