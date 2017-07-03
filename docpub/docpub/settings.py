@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'social.apps.django_app.default',
     'social_django',
+    # 's3direct',
 ]
 
 MIDDLEWARE = [
