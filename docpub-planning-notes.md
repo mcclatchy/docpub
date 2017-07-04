@@ -71,3 +71,5 @@
 
 * COMPLETED: use Google oauth for login
 	* https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
+
+* COMPLETED: encrypt DocumentCloud password

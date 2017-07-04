@@ -293,6 +293,8 @@ Enable uwsgi and nginx to run on startup
 
 # Encryption on Ubuntu
 
+Using [Cryptography](https://cryptography.io/en/latest/) package.
+
 Make sure all of the following are installed (via [SO](https://stackoverflow.com/a/22210069/217955))
 	
 	sudo apt-get install build-essential libssl-dev libffi-dev python-dev
