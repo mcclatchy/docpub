@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from docpub.settings import UPLOAD_PATH, EMBED_CSS
+from docpub.settings import UPLOAD_PATH, EMBED_CSS, CONVERT
 from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
 # from s3direct.fields import S3DirectField
 
@@ -179,6 +179,12 @@ class DocumentCloudCredentials(BasicInfo):
     # email = models.EmailField(max_length=254, help_text='Email address for user in DocPub must be the same as DocumentCloud email address.')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     password = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud password')
+
+    def save(self, *args, **kwargs):
+        password_raw = self.password
+        if password_raw and len(password_raw) > 1:
+            self.password = CONVERT.encrypt(password_raw.encode())
+        return super(DocumentCloudCredentials, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['-created'] # updated might get confusing, but could be more helpful

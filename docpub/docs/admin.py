@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.contrib import messages
-from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY
+from docpub.settings import DC_USERNAME, DC_PASSWORD, COMPANY, CONVERT
 from .models import Document, DocumentCloudCredentials, DocumentSet
 from docs.connection import connection
 from docs.forms import PasswordInline
@@ -124,10 +124,16 @@ class DocumentAdmin(admin.ModelAdmin):
         ## set the DocumentCloud.org client
         if individual:
             email = email_address
-            password = documentcloud_login.password
-        else: 
+            password = str(documentcloud_login.password)
+            # password_encoded = password_encrypted.encode()
+            # password_decrypted = CONVERT.decrypt(password_encoded)
+            # password = password_decrypted.decode()
+        elif shared:
             email = DC_USERNAME
             password = DC_PASSWORD
+        else:
+            message = format_html('No DocumentCloud credentials found for an individual account for you or a shared account for your organization. Please add your individual credentials to your user profile {} and contact an administrator about adding shared account credentials.'.format(user_change_link))
+            messages.error(request, message)
 
         try:
             client = connection(email, password)
