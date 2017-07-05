@@ -126,10 +126,7 @@ class DocumentAdmin(admin.ModelAdmin):
         if individual:
             email = email_address
             password_encrypted = str(documentcloud_login.password)
-            if DOCPUBENV == 'local':
-                password = password_encrypted
-            else:
-                password = decryption(password_encrypted)
+            password = decryption(password_encrypted)
         elif shared:
             email = DC_USERNAME
             password = DC_PASSWORD
