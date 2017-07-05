@@ -165,15 +165,6 @@ class Document(BasicInfo):
             ) # style="border:none;width:100%;height:500px" # desktop height 930px, mobile height 500px
         self.embed_code = style_embed + iframe_embed
 
-## in save method? post save? for text, etc -- anything else that wouldn't initially be available
-    # obj = client.documents.get(obj.id)
-    # while obj.access != 'public':
-    #     time.sleep(5)
-    #     obj = client.documents.get(obj.id)
-    ## we'd also want to grab doc text and thumbnail
-    # obj.full_text
-    # obj.pdf_url
-
 
 class DocumentCloudCredentials(BasicInfo):
     # email = models.EmailField(max_length=254, help_text='Email address for user in DocPub must be the same as DocumentCloud email address.')
