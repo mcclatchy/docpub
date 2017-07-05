@@ -1,5 +1,7 @@
 # To-do list
 
+* TK: check user password on save in User admin, which would help fix issue above and make things better
+
 * TK: make sure Google oauth works with existing accounts that use the auth'ed domains
 	* it seemed to work locally, but not on prod
 
@@ -8,8 +10,6 @@
 	* change save_model method to only choose update method 
 
 * TK: prevent both error messages from appearing? in the case of no password after a doc was previously uploaded, it throws both "re-enter" and "credentials failed" errors, which are redundant
-
-* TK: check user password on save in User admin, which would help fix issue above and make things better
 
 * TK: include newsroom name as field for extended user so we can filter in User admin list view
 	* would that even work bc it'd be stored in a FK field?
