@@ -3,9 +3,10 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.contrib import messages
-from docpub.settings import COMPANY, CONVERT, DC_USERNAME, DC_PASSWORD, DOCPUBENV
+from docpub.settings import COMPANY, DC_USERNAME, DC_PASSWORD, DOCPUBENV
 from .models import Document, DocumentCloudCredentials, DocumentSet
 from docs.connection import connection
+from docs.decryption import decryption
 from docs.forms import PasswordInline
 
 
@@ -128,9 +129,7 @@ class DocumentAdmin(admin.ModelAdmin):
             if DOCPUBENV == 'local':
                 password = password_encrypted
             else:
-                password_encoded = password_encrypted.encode()
-                password_decrypted = CONVERT.decrypt(password_encoded)
-                password = password_decrypted.decode()
+                password = decryption(password_encrypted)
         elif shared:
             email = DC_USERNAME
             password = DC_PASSWORD
