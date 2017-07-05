@@ -13,7 +13,7 @@ urlpatterns = [
     url('', include('social_django.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),
     ## django-s3direct
-    # url(r'^s3direct/', include('s3direct.urls')),
+    url(r'^s3direct/', include('s3direct.urls')),
 ]
 
 if debug:

@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from docpub.settings import UPLOAD_PATH, EMBED_CSS, CONVERT
 from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
-# from s3direct.fields import S3DirectField
+from s3direct.fields import S3DirectField
 
 
 ##### GENERAL FUNCTIONS #####
@@ -50,8 +50,8 @@ class Document(BasicInfo):
     # documentcloud_thumbnail = models.URLField(max_length=255, blank=True, null=True, verbose_name='Document thumbail', help_text='Pulled from DocumentCloud after document finishes processing.')
     documentcloud_url = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud URL', help_text='URL of the document on DocumentCloud')
     embed_code = models.TextField(null=True, blank=True) # , help_text='Copy the full piece of code above.'
-    # file = S3DirectField(dest='mccdata', blank=True, null=True, help_text='Choose the PDF you want to upload or...')
-    file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to=UPLOAD_PATH) ## date: (upload_to='uploads/%Y/%m/%d/') ## this path works for uploading, but not when click in admin afterward
+    file = S3DirectField(dest='mccdata', blank=True, null=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...')
+    # file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to=UPLOAD_PATH) ## date: (upload_to='uploads/%Y/%m/%d/') ## this path works for uploading, but not when click in admin afterward
     link = models.URLField(max_length=255, null=True, blank=True, verbose_name='Link to PDF', help_text='...paste the URL of a PDF you would like to upload. \
         <br><strong>*** NOTES ***</strong><br> \
         - You can only use one PDF option (upload or link)<br> \
