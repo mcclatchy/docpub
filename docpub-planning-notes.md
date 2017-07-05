@@ -3,9 +3,6 @@
 * TK: make sure Google oauth works with existing accounts that use the auth'ed domains
 	* it seemed to work locally, but not on prod
 
-* TK: PDF file storage
-	* S3? https://github.com/bradleyg/django-s3direct
-
 * TK: handle if someone creates a document with no credentials; right now it creates the obj, but then they couldn't update later bc of obj.created condition. so we need to either do: if no obj.link or obj.file, then...
 	* prevent save from initially firing 
 	* change save_model method to only choose update method 
@@ -73,3 +70,6 @@
 	* https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
 
 * COMPLETED: encrypt DocumentCloud password
+
+* COMPLETED: PDF file storage
+	* S3? https://github.com/bradleyg/django-s3direct
