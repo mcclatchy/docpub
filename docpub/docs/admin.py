@@ -169,11 +169,18 @@ class UserInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     inlines = (UserInline,)
 
+    # def save_related(self, request, form, formsets, change):
+    #     message = formsets[0]
+    #     messages.error(request, message)
+    #     super(UserAdmin, self).save_related(request, form, formsets, change)
+
     def save_model(self, request, obj, form, change):
         user = request.user
-        password = DocumentCloudCredentials.objects.filter(user=user)[0].password
-        if password:
-            password = decryption(password)
+        password = obj.documentcloudcredentials.password
+        # message = password
+        # messages.error(request, message)
+        if password and password[-1] != '=':
+            # password = decryption(password)
             client = connection(obj.email, password)
             try:
                 doc = client.documents.upload(TEST_PDF, title='Test password', access='organization', secure=True)
