@@ -1,7 +1,5 @@
 # To-do list
 
-* TK: check user password on save in User admin, which would help fix issue above and make things better
-
 * TK: make sure Google oauth works with existing accounts that use the auth'ed domains
 	* it seemed to work locally, but not on prod
 
@@ -13,6 +11,8 @@
 
 * TK: include newsroom name as field for extended user so we can filter in User admin list view
 	* would that even work bc it'd be stored in a FK field?
+
+* TK: add a custom formatted `list_display` field that displays a checkmark or x depending on whether the user has included a verified DocumentCloud password
 
 # Questions
 
@@ -73,3 +73,7 @@
 
 * COMPLETED: PDF file storage
 	* S3? https://github.com/bradleyg/django-s3direct
+
+* COMPLETED: check user password on save in User admin, which would help fix issue above and make things better
+
+* COMPLETED: avoid need for second save on user edit page re: checking password bc it needs to save on FK'ed model first
