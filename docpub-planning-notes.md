@@ -1,18 +1,14 @@
 # To-do list
 
-* TK: make sure Google oauth works with existing accounts that use the auth'ed domains
-	* it seemed to work locally, but not on prod
-
-* TK: handle if someone creates a document with no credentials; right now it creates the obj, but then they couldn't update later bc of obj.created condition. so we need to either do: if no obj.link or obj.file, then...
-	* prevent save from initially firing 
-	* change save_model method to only choose update method 
-
 * TK: prevent both error messages from appearing? in the case of no password after a doc was previously uploaded, it throws both "re-enter" and "credentials failed" errors, which are redundant
 
 * TK: include newsroom name as field for extended user so we can filter in User admin list view
 	* would that even work bc it'd be stored in a FK field?
 
 * TK: add a custom formatted `list_display` field that displays a checkmark or x depending on whether the user has included a verified DocumentCloud password
+
+* TK: make the condtl under `save_model` for `UserAdmin` bulletproof; currently it would not work properly if a user's DocumentCloud password included an = at the end, like the encrypted passwords all do
+	* e.g. starts with `gAAA` or ???
 
 # Questions
 
@@ -77,3 +73,12 @@
 * COMPLETED: check user password on save in User admin, which would help fix issue above and make things better
 
 * COMPLETED: avoid need for second save on user edit page re: checking password bc it needs to save on FK'ed model first
+
+* COMPLETED: handle if someone creates a document with no credentials; right now it creates the obj, but then they couldn't update later bc of obj.created condition. so we need to either do: if no obj.link or obj.file, then...
+	* prevent save from initially firing 
+	* change save_model method to only choose update method 
+	* SOLUTION: if documentcloud_id, then update; otherwise, upload
+
+* COMPLETED: make sure Google oauth works with existing accounts that use the auth'ed domains
+	* it seemed to work locally, but not on prod
+
