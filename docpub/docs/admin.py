@@ -175,19 +175,25 @@ class UserAdmin(BaseUserAdmin):
     #     super(UserAdmin, self).save_related(request, form, formsets, change)
 
     def save_model(self, request, obj, form, change):
-        user = request.user
-        password = obj.documentcloudcredentials.password
-        if password and password[-1] != '=':
-            client = connection(obj.email, password)
-            try:
-                doc = client.documents.upload(TEST_PDF, title='Test password', access='organization', secure=True)
-                doc.delete()
-            except:
-                message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
+        if change:
+            user = request.user
+            email = obj.email
+            password = obj.documentcloudcredentials.password
+            ## set newsroom
+            # domain = email_address.split('@')[1]
+            # obj.documentcloudcredentials.newsroom = domain
+            ## confirm password is correct
+            if password and password[-1] != '=':
+                client = connection(email, password)
+                try:
+                    doc = client.documents.upload(TEST_PDF, title='Test password', access='organization', secure=True)
+                    doc.delete()
+                except:
+                    message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
+                    messages.error(request, message)
+            elif not password:
+                message = 'Please add your DocumentCloud password at the bottom of this page. This will allow you to upload documents to your account instead of the default shared account.'
                 messages.error(request, message)
-        elif not password:
-            message = 'Please add your DocumentCloud password at the bottom of this page. This will allow you to upload documents to your account instead of the default shared account.'
-            messages.error(request, message)
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 
