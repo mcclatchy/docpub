@@ -175,7 +175,7 @@ class UserAdmin(BaseUserAdmin):
     #     super(UserAdmin, self).save_related(request, form, formsets, change)
 
     def save_model(self, request, obj, form, change):
-        if change:
+        try:
             user = request.user
             email = obj.email
             password = obj.documentcloudcredentials.password
@@ -194,6 +194,8 @@ class UserAdmin(BaseUserAdmin):
             elif not password:
                 message = 'Please add your DocumentCloud password at the bottom of this page. This will allow you to upload documents to your account instead of the default shared account.'
                 messages.error(request, message)
+        except:
+            pass
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 
