@@ -6,7 +6,7 @@ class PasswordInline(ModelForm):
 
     class Meta:
         model = DocumentCloudCredentials
-        fields = ('password',)
+        fields = ('password', 'newsroom')
         widgets = {
             'password': PasswordInput(render_value=True),
         }

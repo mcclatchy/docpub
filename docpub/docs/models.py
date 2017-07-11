@@ -169,6 +169,7 @@ class Document(BasicInfo):
 class DocumentCloudCredentials(BasicInfo):
     # email = models.EmailField(max_length=254, help_text='Email address for user in DocPub must be the same as DocumentCloud email address.')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    newsroom = models.CharField(max_length=255, null=True, blank=True, choices=NEWSROOM_CHOICES)
     password = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud password')
 
     def save(self, *args, **kwargs):

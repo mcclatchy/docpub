@@ -3,9 +3,11 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.contrib import messages
+import sys
 from docpub.settings import COMPANY, DC_USERNAME, DC_PASSWORD, DOCPUBENV, TEST_PDF
 from .models import Document, DocumentCloudCredentials, DocumentSet
 from docs.connection import connection
+from docs.choices import NEWSROOM_CHOICES
 from docs.decryption import decryption
 from docs.forms import PasswordInline
 
@@ -161,32 +163,38 @@ class DocumentAdmin(admin.ModelAdmin):
 
 class UserInline(admin.StackedInline):
     model = DocumentCloudCredentials
+    readonly_fields = ('newsroom',)
     form = PasswordInline
     # can_delete = False
     # verbose_name_plural = 'Login'
 
 
 class UserAdmin(BaseUserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_staff',)
+    list_filter = ('is_staff', 'is_superuser', 'is_active',)# 'user__newsroom')
     inlines = (UserInline,)
 
-    # def save_related(self, request, form, formsets, change):
-    #     message = formsets[0]
-    #     messages.error(request, message)
-    #     super(UserAdmin, self).save_related(request, form, formsets, change)
+    def newsroom_name(self, obj):
+        """ display the newsroom for a user in the admin"""
+        if obj.documentcloudcredentials.newsroom:
+            newsroom = dict(NEWSROOM_CHOICES)[obj.documentcloudcredentials.newsroom]
+            return newsroom
+        else:
+            return None
+    newsroom_name.short_description = 'Newsroom'
 
     def save_model(self, request, obj, form, change):
         try:
-            user = request.user
             email = obj.email
             password = obj.documentcloudcredentials.password
             ## set newsroom
-            # domain = email_address.split('@')[1]
-            # obj.documentcloudcredentials.newsroom = domain
+            domain = email.split('@')[1]
+            DocumentCloudCredentials.objects.filter(user=obj).update(newsroom=domain)
             ## confirm password is correct
             if password and password[-1] != '=':
                 client = connection(email, password)
                 try:
-                    doc = client.documents.upload(TEST_PDF, title='Test password', access='organization', secure=True)
+                    doc = client.documents.upload(TEST_PDF, title='Verify login', access='organization', secure=True)
                     doc.delete()
                 except:
                     message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
@@ -195,7 +203,7 @@ class UserAdmin(BaseUserAdmin):
                 message = 'Please add your DocumentCloud password at the bottom of this page. This will allow you to upload documents to your account instead of the default shared account.'
                 messages.error(request, message)
         except:
-            pass
+            messages.error(request, str(sys.exc_info()))
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 
