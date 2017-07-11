@@ -60,12 +60,13 @@ class DocumentAdmin(admin.ModelAdmin):
     generate_embed_codes.short_description = 'Get embed codes for selected documents'
 
     def get_queryset(self, request):
-        """ only show the current users docs """
+        """ only show the current user's docs """
         qs = super(DocumentAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         else:
             return qs.filter(user=request.user)
+            # return qs.filter(newsroom=request.user.documentcloudcredentials.newsroom)
 
     def save_model(self, request, obj, form, change):
         """ save/update document on DocumentCloud.org and related Document model fields """
@@ -171,7 +172,7 @@ class UserInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_staff',)
-    list_filter = ('is_staff', 'is_superuser', 'is_active',)# 'user__newsroom')
+    list_filter = ('is_staff', 'is_superuser', 'is_active',)
     inlines = (UserInline,)
 
     def newsroom_name(self, obj):
@@ -182,6 +183,14 @@ class UserAdmin(BaseUserAdmin):
         else:
             return None
     newsroom_name.short_description = 'Newsroom'
+
+    # def get_queryset(self, request):
+    #     """ only show the current user's fellow newsroom users """
+    #     qs = super(DocumentAdmin, self).get_queryset(request)
+    #     if request.user.is_superuser:
+    #         return qs
+    #     else:
+    #         return qs.filter(newsroom=request.user.documentcloudcredentials.newsroom)
 
     def save_model(self, request, obj, form, change):
         try:
