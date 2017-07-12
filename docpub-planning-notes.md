@@ -1,14 +1,15 @@
 # To-do list
 
-* TK: prevent both error messages from appearing? in the case of no password after a doc was previously uploaded, it throws both "re-enter" and "credentials failed" errors, which are redundant
+* TK: welcome email template with account information
 
-* TK: include newsroom name as field for extended user so we can filter in User admin list view
-	* would that even work bc it'd be stored in a FK field?
+* TK: send email to super user when someone requests account
 
-* TK: add a custom formatted `list_display` field that displays a checkmark or x depending on whether the user has included a verified DocumentCloud password
+* TK: let users create an account even if not previously set up and automatically set them as staff with necessary perms
+	* https://python-social-auth-docs.readthedocs.io/en/latest/pipeline.html#extending-the-pipeline
 
 * TK: make the condtl under `save_model` for `UserAdmin` bulletproof; currently it would not work properly if a user's DocumentCloud password included an = at the end, like the encrypted passwords all do
 	* e.g. starts with `gAAA` or ???
+	* better solution? add a field indicating password status (empty, unsecure, secure); e.g. empty is when it's `''` or `None`, unsecure 1) is when it was empty and is now not or 2) the last one doesn't match the current one before encrypting
 
 # Questions
 
@@ -82,3 +83,19 @@
 * COMPLETED: make sure Google oauth works with existing accounts that use the auth'ed domains
 	* it seemed to work locally, but not on prod
 
+* N/A: prevent both "add doc" page error messages from appearing? in the case of no password after a doc was previously uploaded, it throws both "re-enter" and "credentials failed" errors, which are redundant
+	* UPDATE: unneeded now bc creds checked in user edit page
+
+* COMPLETED: update `login.html` to emphasis google sign-in
+
+* COMPLETED: include newsroom name as field for extended user so we can filter in User admin list view
+	* would that even work bc it'd be stored in a FK field? it should work like `obj.documentcloudcredentials.newsroom`
+	* under DocCloudCreds, add newsroom field
+	* under UserAdmin add to save method a way to popular based on user email  
+	* under UserAdmin add `list_display` field to display the newsroom name
+
+* COMPLETED: how to handle non-Mclatchy whitelisted email domains? (e.g. gmail)
+	* Solution: try/except statement
+
+* COMPLETED: add a custom formatted `list_display` field that displays a checkmark or x depending on whether the user has included a verified DocumentCloud password
+	* need to add a `verified` field under DocCloudCreds
