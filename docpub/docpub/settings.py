@@ -27,6 +27,8 @@ if DOCPUBENV != 'prod':
 else:
     DEBUG = False
 
+APP_DOMAIN = APP_DOMAINS[DOCPUBENV]
+
 # ALLOWED_HOSTS = [] ## imported from private
 INTERNAL_IPS = ['127.0.0.1']
 
@@ -177,7 +179,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.social_auth.associate_by_email',
     'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
+    ## if not existing, apply necessary permissions
+    'docs.pipeline.apply_permissions',
+    ## if not existing, email admins
+    # 'docs.pipeline.email_admins',
+    'docs.pipeline.slack_notify',
 )
 
