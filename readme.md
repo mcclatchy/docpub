@@ -1,5 +1,13 @@
+# Features
 
-# Prerequisites
+* use Google oauth to log into the Django admin (including with option to whitelist domains)
+* save your DocumentCloud password as part of your DocPub user profile so you can upload directly to your individual account; if you don't include a password, then it uploads to a shared DocumentCloud account
+* in addition to uploading a PDF from your computer, you can also paste a URL to upload a document
+* you immediately get the embed code after uploading -- including with a handy one-click-to-copy button
+* the embed code generated is an iframe (compared to the default script-based embed you get from DocumentCloud), so it should work on platforms like Google AMP that don't allow script tags
+* after uploading and if you're logged into DocumentCloud, you have the ability to open the document viewer and add any notes, redactions, etc directly on the document
+
+# Prerequisites for installation
 
 * Mac OS X (local server)
 * Ubuntu 16 (test/prod server)
