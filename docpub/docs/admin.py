@@ -171,7 +171,7 @@ class UserInline(admin.StackedInline):
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_verified', 'is_staff',)
+    list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_verified', 'is_superuser', 'is_staff')
     list_filter = ('is_staff', 'is_superuser', 'is_active',)
     inlines = (UserInline,)
 
