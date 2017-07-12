@@ -2,10 +2,14 @@
 
 * TK: welcome email template with account information
 
-* TK: send email to super user when someone requests account
+* TK: send emails
+	* `new_user` to superadmin after user signs up
+	* `confirmation` to user after they get perms
+	* `welcome` to new user after superadmin adds them
 
-* TK: let users create an account even if not previously set up and automatically set them as staff with necessary perms
-	* https://python-social-auth-docs.readthedocs.io/en/latest/pipeline.html#extending-the-pipeline
+* TK: if email domain not whitelisted, update oauth process to redirect to a page that says `Thanks for registering! Your account has been sent to an administrator for approval`
+
+* TK: how to mark an account as `verified` after the test has occurred? currently only updates that field during the test upload
 
 * TK: make the condtl under `save_model` for `UserAdmin` bulletproof; currently it would not work properly if a user's DocumentCloud password included an = at the end, like the encrypted passwords all do
 	* e.g. starts with `gAAA` or ???
@@ -99,3 +103,8 @@
 
 * COMPLETED: add a custom formatted `list_display` field that displays a checkmark or x depending on whether the user has included a verified DocumentCloud password
 	* need to add a `verified` field under DocCloudCreds
+
+* COMPLETED: let users create an account even if not previously set up and automatically set them as staff with necessary perms
+	* https://python-social-auth-docs.readthedocs.io/en/latest/pipeline.html#extending-the-pipeline
+
+* COMPLETED: Slack output when new user logs in with oauth
