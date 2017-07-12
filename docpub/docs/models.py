@@ -171,6 +171,7 @@ class DocumentCloudCredentials(BasicInfo):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     newsroom = models.CharField(max_length=255, null=True, blank=True, choices=NEWSROOM_CHOICES)
     password = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud password')
+    verified = models.BooleanField(blank=True, default=False, verbose_name='DocumentCloud credentials verified?')
 
     def save(self, *args, **kwargs):
         password_raw = self.password

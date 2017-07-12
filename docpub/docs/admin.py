@@ -171,15 +171,14 @@ class UserInline(admin.StackedInline):
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_staff',)
-    # list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_verified', 'is_staff',)
+    list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_verified', 'is_staff',)
     list_filter = ('is_staff', 'is_superuser', 'is_active',)
     inlines = (UserInline,)
 
-    # def is_verified(self,obj):
-    #     return obj.documentcloudcredentials.verified
-    # is_verified.short_description = 'Verified?'
-    # is_verified.boolean = True
+    def is_verified(self,obj):
+        return obj.documentcloudcredentials.verified
+    is_verified.short_description = 'Verified?'
+    is_verified.boolean = True
 
     def newsroom_name(self, obj):
         """ display the newsroom for a user in the admin"""
@@ -212,10 +211,12 @@ class UserAdmin(BaseUserAdmin):
             if password and password[-1] != '=':
                 client = connection(email, password)
                 try:
+                    ## upload a test doc
                     doc = client.documents.upload(TEST_PDF, title='Verify login', access='organization', secure=True)
-                    # if doc.id:
-                    #     obj.documentcloudcredentials.verified = True
-                    #     obj.save()
+                    ## if upload works, mark this account as verified
+                    if doc.id:
+                        obj.documentcloudcredentials.verified = True
+                    ## delete the test doc on DocumentCloud
                     doc.delete()
                 except:
                     message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
