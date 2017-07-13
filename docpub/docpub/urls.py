@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from docpub.settings import DEBUG as debug
+from docpub.settings import DEBUG, DOCPUBENV
 from docs.views import index
 
 
@@ -16,8 +16,12 @@ urlpatterns = [
     url(r'^s3direct/', include('s3direct.urls')),
 ]
 
-if debug:
+if DEBUG:
     import debug_toolbar
     urlpatterns = [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+
+admin.site.site_header = 'DocPub {}'.format(DOCPUBENV)
+admin.site.site_url = None
+
