@@ -32,9 +32,16 @@ Create an environment
 
 ## Bash alias
 
-Add this to your `bash_profile` (e.g. Mac) or `bash_rc` (e.g. Linux)
+Add these to your `bash_profile` (e.g. Mac) or `bash_rc` (e.g. Linux)
 
+	# enable the virtualenv and change into that dir
 	alias='workon docpub && cd ~/path/to/docpub/docpub' 
+
+	# update the app from github and run any migrations
+	alias updatedocpub='git pull && ~/Envs/docpub/bin/python3 manage.py makemigrations && ~/Envs/docpub/bin/python3 manage.py migrate'
+
+	# restart uwsgi
+	alias restartuwsgi='sudo systemctl restart uwsgi'
 
 ## Requirements
 
