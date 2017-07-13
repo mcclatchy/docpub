@@ -97,7 +97,10 @@ class DocumentAdmin(admin.ModelAdmin):
                 obj.newsroom = '%s (unspecified)' % (COMPANY)
 
         ## determine if password exists
-        documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)[0]
+        try:
+            documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)[0]
+        except:
+            pass
         if documentcloud_login.password:
             password_exists = True
         else:
