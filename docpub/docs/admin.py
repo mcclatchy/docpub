@@ -99,12 +99,9 @@ class DocumentAdmin(admin.ModelAdmin):
         ## determine if password exists
         try:
             documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)[0]
+            if documentcloud_login.password:
+                password_exists = True        
         except:
-            documentcloud_login = None
-            documentcloud_login.password = None
-        if documentcloud_login.password:
-            password_exists = True
-        else:
             password_exists = False
 
         ## choose which DocumentCloud.org creds to use
