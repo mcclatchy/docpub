@@ -100,7 +100,7 @@ class DocumentAdmin(admin.ModelAdmin):
         try:
             documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)[0]
         except:
-            pass
+            documentcloud_login = None
         if documentcloud_login.password:
             password_exists = True
         else:
