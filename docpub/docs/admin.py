@@ -10,6 +10,7 @@ from docs.connection import connection
 from docs.choices import NEWSROOM_CHOICES
 from docs.decryption import decryption
 from docs.forms import PasswordInline
+from docs.slackbot import slackbot
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -19,11 +20,11 @@ class DocumentAdmin(admin.ModelAdmin):
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('secure', 'sidebar', 'related_article', 'user',)
+            'fields': ('secure', 'sidebar', 'related_article', 'account', 'user')
         })
     )
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
-    list_display = ('title', 'created', 'source', 'access', 'documentcloud_url_formatted', 'copy_embed_code',)
+    list_display = ('title', 'created', 'access', 'copy_embed_code',) # , 'documentcloud_url_formatted', 'source'
     list_editable = ('access',)
     list_filter = ('access',) # 'project', 'updated', 'created',
     readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user',) # 'documentcloud_id', 'uploaded_by'
@@ -44,9 +45,9 @@ class DocumentAdmin(admin.ModelAdmin):
         if obj.documentcloud_id:
             link = format_html('<a class="button" href="{}" target="_blank">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
         elif obj.file or obj.link:
-            link = 'Click "Save" again on this doc, or make sure your DocumentCloud credentials are entered and correct'
+            link = 'Click "Save" again on this document.' # , or make sure your DocumentCloud credentials are entered and correct
         else:
-            link = 'Upload or link to a PDF, then hit "Save" below.'
+            link = 'Upload or link to a PDF, then hit "Save."'
         return link
     documentcloud_url_formatted.short_description = 'DocumentCloud link'
 
@@ -98,8 +99,8 @@ class DocumentAdmin(admin.ModelAdmin):
 
         ## determine if password exists
         try:
-            documentcloud_login = DocumentCloudCredentials.objects.filter(user=user)[0]
-            if documentcloud_login.password:
+            documentcloud_password = str(DocumentCloudCredentials.objects.filter(user=user)[0].password)
+            if documentcloud_password:
                 password_exists = True        
         except:
             password_exists = False
@@ -129,7 +130,7 @@ class DocumentAdmin(admin.ModelAdmin):
         ## set the DocumentCloud.org client
         if individual:
             email = email_address
-            password_encrypted = str(documentcloud_login.password)
+            password_encrypted = documentcloud_password
             password = decryption(password_encrypted)
         elif shared:
             email = DC_USERNAME
@@ -206,8 +207,9 @@ class UserAdmin(BaseUserAdmin):
             email = obj.email
             password = obj.documentcloudcredentials.password
             ## set newsroom
-            domain = email.split('@')[1]
-            DocumentCloudCredentials.objects.filter(user=obj).update(newsroom=domain)
+            if email:
+                domain = email.split('@')[1]
+                DocumentCloudCredentials.objects.filter(user=obj).update(newsroom=domain)
             ## confirm password is correct
             if password and password[-1] != '=':
                 client = connection(email, password)
@@ -226,7 +228,9 @@ class UserAdmin(BaseUserAdmin):
                 message = 'Please add your DocumentCloud password at the bottom of this page. This will allow you to upload documents to your account instead of the default shared account.'
                 messages.error(request, message)
         except:
-            messages.error(request, str(sys.exc_info()))
+            message = str(sys.exc_info())
+            messages.error(request, message)
+            slackbot('ERROR: User admin\n' + user + '\n' + message)
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 
