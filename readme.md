@@ -13,6 +13,7 @@
 * Ubuntu 16 (test/prod server)
 * Python 3.x (e.g. Python 3.5.1)
 	* check your version by running `python3 --version`
+* pip3
 * virtualenv
 * virtualenvwrapper
 * git
@@ -39,9 +40,6 @@ Add these to your `bash_profile` (e.g. Mac) or `bash_rc` (e.g. Linux)
 
 	# update the app from github and run any migrations
 	alias docpubupdate='git pull && ~/Envs/docpub/bin/python3 manage.py makemigrations && ~/Envs/docpub/bin/python3 manage.py migrate'
-
-	# restart uwsgi
-	alias restartuwsgi='sudo systemctl restart uwsgi'
 
 ## Requirements
 
@@ -107,6 +105,14 @@ Install necessary system packages
 	sudo apt-get install python3-pip
 	sudo -H pip3 install virtualenv virtualenvwrapper
 
+# Prerequisites for Cryptography package
+
+[Cryptography](https://cryptography.io/en/latest/) package used for encrypting DocumentCloud password in database.
+
+Install all of the following via [SO](https://stackoverflow.com/a/22210069/217955))
+	
+	sudo apt-get install build-essential libssl-dev libffi-dev python-dev
+
 Add the following to your `.bashrc` file
 
 	## virtualenvwrapper vars
@@ -117,10 +123,8 @@ Add the following to your `.bashrc` file
 
 	## DOCPUB APP
 	alias docpub='workon docpub && cd ~/docpub/docpub'
-
-Make the virtualenvs directory
-
-	mkdir -p ~/Envs
+	alias docpubupdate='git pull && ~/Envs/docpub/bin/python3 manage.py makemigrations && ~/Envs/docpub/bin/python3 manage.py migrate'
+	alias restartuwsgi='sudo systemctl restart uwsgi'
 
 Enable the new settings
 
@@ -167,6 +171,10 @@ Create a super user
 
 	python3 manage.py createsuperuser
 
+Collect static assets
+
+	python3 manage.py collectstatic
+
 Update the firewall permissions
 
 	sudo ufw allow 8080
@@ -177,7 +185,7 @@ Test the local server
 
 Go here, confirm the admin login page appears and log in to confirm everything works as expected.
 	
-	your-domain.com/admin
+	your-domain.com:8080/admin
 
 Stop the local server
 
@@ -272,7 +280,7 @@ Add this
 	        include         uwsgi_params;
 	        uwsgi_pass      unix:/run/uwsgi/docpub.sock;
 	    }
-	}	
+	}
 
 Remove the symlink for the default site
 
@@ -305,15 +313,6 @@ Enable uwsgi and nginx to run on startup
 
 	sudo systemctl enable nginx
 	sudo systemctl enable uwsgi
-
-# Encryption on Ubuntu
-
-Using [Cryptography](https://cryptography.io/en/latest/) package.
-
-Make sure all of the following are installed (via [SO](https://stackoverflow.com/a/22210069/217955))
-	
-	sudo apt-get install build-essential libssl-dev libffi-dev python-dev
-
 
 # Google oauth
 
