@@ -227,7 +227,7 @@ Paste in these settings
 	master = true
 	processes = 5
 
-	socket = /run/uwsgi/%(project).sock
+	socket = /tmp/%(project).sock
 	chown-socket = %(uid):www-data
 	chmod-socket = 660
 	vacuum = true
@@ -278,7 +278,7 @@ Add this
 
 	    location / {
 	        include         uwsgi_params;
-	        uwsgi_pass      unix:/run/uwsgi/docpub.sock;
+	        uwsgi_pass      unix:/tmp/docpub.sock;
 	    }
 	}
 
