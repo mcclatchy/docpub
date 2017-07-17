@@ -48,6 +48,11 @@ NEWSROOM_CHOICES = (
     ('mcclatchy.com', 'McClatchy'),
 )
 
+UPLOADER_ACCOUNT_CHOICES = (
+    ('shared', 'Shared account'),
+    ('yours', 'Your account'),
+)
+
 # NEWSROOM_DOMAIN_MAPPING = {
 #     'beaufortgazette.com': 'Beaufort Gazette',
 #     'bellinghamherald.com': 'Bellingham Herald',

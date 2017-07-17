@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from docpub.settings import UPLOAD_PATH, EMBED_CSS, CONVERT
-from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES
+from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES, UPLOADER_ACCOUNT_CHOICES
 from s3direct.fields import S3DirectField
 
 
@@ -42,7 +42,7 @@ class DocumentSet(BasicInfo):
 
 class Document(BasicInfo):
     access = models.CharField(max_length=255, null=True, choices=ACCESS_CHOICES, verbose_name='Who can see this?', help_text='Should the document be publicly visible or only visible to other users in your DocumentCloud organization?')
-    account = models.CharField(max_length=100, null=True, blank=True, verbose_name='Who owns this doc?', help_text='This can\'t be changed')
+    account = models.CharField(choices=UPLOADER_ACCOUNT_CHOICES, max_length=100, null=True, blank=True, verbose_name='Who owns this doc?', help_text='This can\'t be changed')
     description = models.TextField(blank=True, null=True, help_text='Optional (but strongly encouraged) description of the document. <strong>PUBLIC</strong>')
     document_set = models.ForeignKey(DocumentSet, null=True, blank=True)
     documentcloud_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud ID', help_text='ID of the document on DocumentCloud')
@@ -65,8 +65,8 @@ class Document(BasicInfo):
     source = models.CharField(max_length=255, blank=True, null=True, verbose_name='Source name', help_text='What organization, person, etc. created this document? Optional, but strongly encouraged if not a senstive/confidential. <strong>PUBLIC</strong>')
     text = models.TextField(null=True, blank=True, verbose_name='Document text', help_text='Text of the PDF extracted by DocumentCloud. Leave this blank when you first upload the document. It will be filled in automatically. If the plain text does not appear after initially creating/saving here, check on DocumentCloud.org to see if the document is finished processing. When it is done, come back here and click "Save and continue editing" below, then verify the text is filled in here. If you would like, you can clean up the text as needed after it appears here. At any point in the process, the plain text will not be overwritten if there is any text here -- original or modified.')
     title = models.CharField(max_length=255, blank=False, null=True, help_text='Short yet descriptive title (e.g. 2017 House budget proposal). <strong>PUBLIC</strong>')
-    uploaded_by = models.CharField(max_length=255, null=True, blank=True, help_text='If left blank and your name is not entered on your user profile, then it will grab the first part of your email address (specifically, everything before the @ symbol). You can update this later.')
-    user = models.ForeignKey(User, null=True, blank=True, verbose_name='Document owned by', help_text='Which account was used to upload this document?')
+    # uploaded_by = models.CharField(max_length=255, null=True, blank=True, help_text='If left blank and your name is not entered on your user profile, then it will grab the first part of your email address (specifically, everything before the @ symbol). You can update this later.')
+    user = models.ForeignKey(User, null=True, blank=True, verbose_name='Uploaded by') # , help_text='Which account was used to upload this document?'
 
     class Meta:
         ordering = ['-created'] # updated might get confusing, but could be more helpful

@@ -16,11 +16,11 @@ from docs.slackbot import slackbot
 class DocumentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code', 'copy_embed_code', 'documentcloud_url_formatted') #'project', 'copy_embed_code',
+            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'user', 'newsroom', 'embed_code', 'copy_embed_code', 'documentcloud_url_formatted') #'project', 'copy_embed_code',
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('secure', 'sidebar', 'related_article', 'account', 'user')
+            'fields': ('secure', 'sidebar', 'related_article', 'account',)
         })
     )
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
@@ -81,16 +81,16 @@ class DocumentAdmin(admin.ModelAdmin):
         ## populate uploaded_by and newsroom
         fullname = user.get_full_name()
         email_split = email_address.split('@')
-        uploaded_by = obj.uploaded_by
+        # uploaded_by = obj.uploaded_by
         newsroom = obj.newsroom
 
-        if not obj.uploaded_by:
-            if fullname:
-                obj.uploaded_by = fullname
-            elif email_address:
-                obj.uploaded_by = email_split[0]
-            else:
-                obj.uploaded_by = user.username
+        # if not obj.uploaded_by:
+        #     if fullname:
+        #         obj.uploaded_by = fullname
+        #     elif email_address:
+        #         obj.uploaded_by = email_split[0]
+        #     else:
+        #         obj.uploaded_by = user.username
         if not obj.newsroom:
             if email_address:
                 obj.newsroom = email_split[1]
@@ -114,14 +114,14 @@ class DocumentAdmin(admin.ModelAdmin):
         if not obj.created:
             if password_exists:
                 individual = True
-                obj.account = 'Your account'
+                obj.account = 'yours'
             else:
                 shared = True   
-                obj.account = 'Shared account'
+                obj.account = 'shared'
         else:
-            if obj.account == 'Shared account' and password_exists:
+            if obj.account == 'shared' and password_exists:
                 shared = True
-            elif obj.account == 'Your account' and not password_exists:
+            elif obj.account == 'yours' and not password_exists:
                 message = format_html('You need to re-enter your DocumentCloud password ' + user_change_link)
                 messages.error(request, message)
             else:
