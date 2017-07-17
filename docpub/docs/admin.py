@@ -27,7 +27,7 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = ('title', 'created', 'access', 'copy_embed_code',) # , 'documentcloud_url_formatted', 'source'
     list_editable = ('access',)
     list_filter = ('access',) # 'project', 'updated', 'created',
-    readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user',) # 'documentcloud_id', 'uploaded_by'
+    readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user',) # 'documentcloud_id'
     actions = ('generate_embed_codes')
 
     def copy_embed_code(self, obj):
@@ -71,89 +71,89 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         """ save/update document on DocumentCloud.org and related Document model fields """
-        user = request.user
-        email_address = user.email
-
-        ## populate user FK on model
-        if not obj.created:
-            obj.user = user
-
-        ## populate uploaded_by and newsroom
-        fullname = user.get_full_name()
-        email_split = email_address.split('@')
-        # uploaded_by = obj.uploaded_by
-        newsroom = obj.newsroom
-
-        # if not obj.uploaded_by:
-        #     if fullname:
-        #         obj.uploaded_by = fullname
-        #     elif email_address:
-        #         obj.uploaded_by = email_split[0]
-        #     else:
-        #         obj.uploaded_by = user.username
-        if not obj.newsroom:
-            if email_address:
-                obj.newsroom = email_split[1]
-            else:
-                obj.newsroom = '%s (unspecified)' % (COMPANY)
-
-        ## determine if password exists
         try:
-            documentcloud_password = str(DocumentCloudCredentials.objects.filter(user=user)[0].password)
-            if documentcloud_password:
-                password_exists = True        
-        except:
-            password_exists = False
+            user = request.user
+            email_address = user.email
 
-        ## choose which DocumentCloud.org creds to use
-        shared = False
-        individual = False
+            ## populate user FK on model
+            if not obj.created:
+                obj.user = user
 
-        user_change_link = '<a href="/admin/auth/user/{}/change/#documentcloudcredentials-0" target="_blank">here</a>.'.format(user.id)
+            ## populate newsroom
+            fullname = user.get_full_name()
+            email_split = email_address.split('@')
+            newsroom = obj.newsroom
 
-        if not obj.created:
-            if password_exists:
-                individual = True
-                obj.account = 'yours'
+            if not obj.newsroom:
+                if email_address:
+                    obj.newsroom = email_split[1]
+                else:
+                    obj.newsroom = '%s (unspecified)' % (COMPANY)
+
+            ## determine if password exists
+            try:
+                documentcloud_password = str(DocumentCloudCredentials.objects.filter(user=user)[0].password)
+                if documentcloud_password:
+                    password_exists = True
+            except:
+                password_exists = False
+
+            ## choose which DocumentCloud.org creds to use
+            shared = False
+            individual = False
+
+            user_change_link = '<a href="/admin/auth/user/{}/change/#documentcloudcredentials-0" target="_blank">here</a>.'.format(user.id)
+
+            if not obj.created:
+                if password_exists:
+                    individual = True
+                    obj.account = 'yours'
+                else:
+                    shared = True
+                    obj.account = 'shared'
             else:
-                shared = True   
-                obj.account = 'shared'
-        else:
-            if obj.account == 'shared' and password_exists:
-                shared = True
-            elif obj.account == 'yours' and not password_exists:
-                message = format_html('You need to re-enter your DocumentCloud password ' + user_change_link)
+                if obj.account == 'shared' and password_exists:
+                    shared = True
+                elif obj.account == 'yours' and not password_exists:
+                    message = format_html('You need to re-enter your DocumentCloud password ' + user_change_link)
+                    messages.error(request, message)
+                else:
+                    individual = True
+
+            ## set the DocumentCloud.org client
+            if individual:
+                email = email_address
+                password_encrypted = documentcloud_password
+                password = decryption(password_encrypted)
+            elif shared:
+                email = DC_USERNAME
+                password = DC_PASSWORD
+            else:
+                message = format_html('No DocumentCloud credentials found for an individual account for you or a shared account for your organization. Please add your individual credentials to your user profile {} and contact an administrator about adding shared account credentials.'.format(user_change_link))
                 messages.error(request, message)
-            else:
-                individual = True
 
-        ## set the DocumentCloud.org client
-        if individual:
-            email = email_address
-            password_encrypted = documentcloud_password
-            password = decryption(password_encrypted)
-        elif shared:
-            email = DC_USERNAME
-            password = DC_PASSWORD
-        else:
-            message = format_html('No DocumentCloud credentials found for an individual account for you or a shared account for your organization. Please add your individual credentials to your user profile {} and contact an administrator about adding shared account credentials.'.format(user_change_link))
-            messages.error(request, message)
+            try:
+                client = connection(email, password)
 
-        try:
-            client = connection(email, password)
-
-            ## determine whether to create or update
-            if obj.documentcloud_id:
-                obj.document_update(client)
-            else:
-                obj.document_upload(client)
+                ## determine whether to create or update
+                if obj.documentcloud_id:
+                    obj.document_update(client)
+                else:
+                    obj.document_upload(client)
+            except:
+                message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password ' + user_change_link)
+                messages.error(request, message)
         except:
-            message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password ' + user_change_link)
+            message = str(sys.exc_info())
             messages.error(request, message)
 
         ## generate the embed
-        if obj.documentcloud_id:
-            obj.generate_embed()
+        try:
+            if obj.documentcloud_id:
+                obj.generate_embed()
+        except:
+            message = str(sys.exc_info())
+            messages.error(request, message)
 
         super(DocumentAdmin, self).save_model(request, obj, form, change)    
 
@@ -238,7 +238,7 @@ class DocumentSetInline(admin.StackedInline):
     model = Document
     fieldsets = (
         (None, {
-            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code', 'documentcloud_url') #'project', 'copy_embed_code', 'documentcloud_url_formatted'
+            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'user', 'newsroom', 'embed_code', 'documentcloud_url') #'project', 'copy_embed_code', 'documentcloud_url_formatted'
         }),
         ('Advanced options', {
             'classes': ('collapse',),
@@ -246,8 +246,8 @@ class DocumentSetInline(admin.StackedInline):
         })
     )
     ## for admin.TabularInline
-    # fields = ('access', 'title', ('file', 'link',), 'source', 'documentcloud_url',) # 'description', 'source', 'uploaded_by', 'newsroom', 'embed_code')
-    readonly_fields = ('documentcloud_url',)
+    # fields = ('access', 'title', ('file', 'link',), 'source', 'documentcloud_url',) # 'description', 'source', 'newsroom', 'embed_code')
+    readonly_fields = ('documentcloud_url', 'user')
     show_change_link = True
     extra = 1
     # classes = ['collapse'] ## collapses the entire set of inlines
