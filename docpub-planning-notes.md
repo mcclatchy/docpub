@@ -1,5 +1,16 @@
 # To-do list
 
+* TK: fix `user` if uploaded to shared? Ben C uploaded one with shared account and it showed him as the owner, not shared account as owner
+
+* TK: Ben C got `documentcloud_login` referenced before assignment, which he shouldn't get bc doc uploaded to the shared acct; must be related to fast that it think uploaded to individual instead of shared acct
+
+* TK/Q: update `account` field to pull from choices listing `shared` or `individual`
+	* how to account for existing data (e.g. `Your Account` or `Shared account`)
+
+* TK: if uploaded to shared account, give warning that user won't be able to view if access set to `Your newsroom` and don't have the shared account credentials (maybe don't say the second part tho)
+
+* TK: remove `View site`in Django admin
+
 * TK: welcome email template with account information
 
 * TK: send emails
