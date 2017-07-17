@@ -65,7 +65,6 @@ class Document(BasicInfo):
     source = models.CharField(max_length=255, blank=True, null=True, verbose_name='Source name', help_text='What organization, person, etc. created this document? Optional, but strongly encouraged if not a senstive/confidential. <strong>PUBLIC</strong>')
     text = models.TextField(null=True, blank=True, verbose_name='Document text', help_text='Text of the PDF extracted by DocumentCloud. Leave this blank when you first upload the document. It will be filled in automatically. If the plain text does not appear after initially creating/saving here, check on DocumentCloud.org to see if the document is finished processing. When it is done, come back here and click "Save and continue editing" below, then verify the text is filled in here. If you would like, you can clean up the text as needed after it appears here. At any point in the process, the plain text will not be overwritten if there is any text here -- original or modified.')
     title = models.CharField(max_length=255, blank=False, null=True, help_text='Short yet descriptive title (e.g. 2017 House budget proposal). <strong>PUBLIC</strong>')
-    # uploaded_by = models.CharField(max_length=255, null=True, blank=True, help_text='If left blank and your name is not entered on your user profile, then it will grab the first part of your email address (specifically, everything before the @ symbol). You can update this later.')
     user = models.ForeignKey(User, null=True, blank=True, verbose_name='Uploaded by') # , help_text='Which account was used to upload this document?'
 
     class Meta:
@@ -95,7 +94,6 @@ class Document(BasicInfo):
         """ add key-value pairs to document on DocumentCloud """
         newsrooms = dict(NEWSROOM_CHOICES)
         return {
-            'uploaded_by': self.uploaded_by,
             'newsroom': newsrooms[self.newsroom],
         }
 
