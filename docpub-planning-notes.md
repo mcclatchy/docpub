@@ -4,9 +4,6 @@
 
 * TK: Ben C got `documentcloud_login` referenced before assignment, which he shouldn't get bc doc uploaded to the shared acct; must be related to fast that it think uploaded to individual instead of shared acct
 
-* TK/Q: update `account` field to pull from choices listing `shared` or `individual`
-	* how to account for existing data (e.g. `Your Account` or `Shared account`)
-
 * TK: if uploaded to shared account, give warning that user won't be able to view if access set to `Your newsroom` and don't have the shared account credentials (maybe don't say the second part tho)
 
 * TK: remove `View site`in Django admin
@@ -119,3 +116,5 @@
 	* https://python-social-auth-docs.readthedocs.io/en/latest/pipeline.html#extending-the-pipeline
 
 * COMPLETED: Slack output when new user logs in with oauth
+
+* COMPLETED: update `account` field to pull from choices listing `shared` or `individual`
