@@ -225,7 +225,7 @@ class UserAdmin(BaseUserAdmin):
                     message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
                     messages.error(request, message)
             elif not password:
-                message = 'Please add your DocumentCloud password at the bottom of this page. This will allow you to upload documents to your account instead of the default shared account.'
+                message = 'Please add your DocumentCloud password at the bottom of your user profile. This will allow you to upload documents to your account instead of the default shared account.'
                 messages.error(request, message)
         except:
             message = str(sys.exc_info())
