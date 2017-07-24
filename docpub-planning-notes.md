@@ -1,5 +1,8 @@
 # To-do list
 
+* TK: fix 403 error when when signing in with Google oauth
+	* `accounts/login` not found in URLs, but not an issue when logging with existing user
+
 * TK: fix `user` if uploaded to shared? Ben C uploaded one with shared account and it showed him as the owner, not shared account as owner
 
 * TK: Ben C got `documentcloud_login` referenced before assignment, which he shouldn't get bc doc uploaded to the shared acct; must be related to fast that it think uploaded to individual instead of shared acct
@@ -7,6 +10,8 @@
 * TK: if uploaded to shared account, give warning that user won't be able to view if access set to `Your newsroom` and don't have the shared account credentials (maybe don't say the second part tho)
 
 * TK: remove `View site`in Django admin
+
+* TK: ability to include newsroom even if there's no password
 
 * TK: welcome email template with account information
 
