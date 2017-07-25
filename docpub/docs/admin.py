@@ -203,34 +203,31 @@ class UserAdmin(BaseUserAdmin):
     #         return qs.filter(newsroom=request.user.documentcloudcredentials.newsroom)
 
     def save_model(self, request, obj, form, change):
-        try:
+        if obj.email:
             email = obj.email
+            # set the newsroom 
+            domain = email.split('@')[1]
+            DocumentCloudCredentials.objects.filter(user=obj).update(newsroom=domain)
+        password = ''
+        try:
             password = obj.documentcloudcredentials.password
-            ## set newsroom
-            if email:
-                domain = email.split('@')[1]
-                DocumentCloudCredentials.objects.filter(user=obj).update(newsroom=domain)
-            ## confirm password is correct
-            if password and password[-1] != '=':
-                client = connection(email, password)
-                try:
-                    ## upload a test doc
-                    doc = client.documents.upload(TEST_PDF, title='Verify login', access='organization', secure=True)
-                    ## if upload works, mark this account as verified
-                    if doc.id:
-                        obj.documentcloudcredentials.verified = True
-                    ## delete the test doc on DocumentCloud
-                    doc.delete()
-                except:
-                    message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
-                    messages.error(request, message)
-            elif not password:
-                message = 'Please add your DocumentCloud password at the bottom of your user profile. This will allow you to upload documents to your account instead of the default shared account.'
-                messages.error(request, message)
         except:
-            message = str(sys.exc_info())
+            message = 'Please add your DocumentCloud password at the bottom of your user profile. This will allow you to upload documents to your account instead of the default shared account.'
             messages.error(request, message)
-            slackbot('ERROR: User admin\n' + obj.get_username() + '\n' + message)
+        ## confirm password is correct
+        if password and password[-1] != '=':
+            client = connection(email, password)
+            try:
+                ## upload a test doc
+                doc = client.documents.upload(TEST_PDF, title='Verify login', access='organization', secure=True)
+                ## if upload works, mark this account as verified
+                if doc.id:
+                    obj.documentcloudcredentials.verified = True
+                ## delete the test doc on DocumentCloud
+                doc.delete()
+            except:
+                message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
+                messages.error(request, message)
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 
