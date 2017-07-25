@@ -24,15 +24,11 @@ class DocumentAdmin(admin.ModelAdmin):
         ('About this document'.upper(), {
             'fields': ('user', 'account', 'newsroom',) #'project', 'copy_embed_code',
         }),
-        # (None, {
-        #     'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'user', 'account', 'newsroom', 'embed_code', 'copy_embed_code', 'documentcloud_url_formatted') #'project', 'copy_embed_code',
-        # }),
         ('Advanced options', {
             'classes': ('collapse',),
             'fields': ('secure', 'sidebar', 'related_article',)
         })
     )
-    # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
     list_display = ('title', 'created', 'access', 'copy_embed_code',) # , 'documentcloud_url_formatted', 'source'
     list_editable = ('access',)
     list_filter = ('access',) # 'project', 'updated', 'created',
@@ -269,20 +265,10 @@ class DocumentSetAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     inlines = (DocumentSetInline,)
 
-## TEMPLATE
-# class Admin(admin.ModelAdmin):
-#     fields = ('')
-#     list_display = 
-#     # list_editable = ('')
-#     list_filter = 
-#     search_fields = 
-#     # exclude  = ('')
-
 
 admin.site.register(Document, DocumentAdmin)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(DocumentSet, DocumentSetAdmin)
 # admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
-## TEMPLATE
-# admin.site.register(, )
+
