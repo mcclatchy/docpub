@@ -1,5 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from docpub.settings import DEBUG, DOCPUBENV
 from docs.views import index
 
@@ -7,6 +8,7 @@ from docs.views import index
 urlpatterns = [
     url(r'^docs/', include('docs.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view()),
     ## social auth
     url(r'^$', index, name='index'),
     # url('', include('social.apps.django_app.urls', namespace='social')),
@@ -24,6 +26,7 @@ if DEBUG:
     ] + urlpatterns
 
 ## if we're not on prod, include the environment in the header
+env = ''
 if DOCPUBENV != 'prod':
     env = DOCPUBENV
 
