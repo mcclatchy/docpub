@@ -71,15 +71,16 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         """ save/update document on DocumentCloud.org and related Document model fields """
+
+        user = request.user
+        email_address = user.email
+
+        ## populate user FK on model
+        if not obj.created:
+            obj.user = user
+
+        ## populate newsroom
         try:
-            user = request.user
-            email_address = user.email
-
-            ## populate user FK on model
-            if not obj.created:
-                obj.user = user
-
-            ## populate newsroom
             fullname = user.get_full_name()
             email_split = email_address.split('@')
             newsroom = obj.newsroom
@@ -89,62 +90,64 @@ class DocumentAdmin(admin.ModelAdmin):
                     obj.newsroom = email_split[1]
                 else:
                     obj.newsroom = '%s (unspecified)' % (COMPANY)
-
-            ## determine if password exists
-            try:
-                documentcloud_password = str(DocumentCloudCredentials.objects.filter(user=user)[0].password)
-                if documentcloud_password:
-                    password_exists = True
-            except:
-                password_exists = False
-
-            ## choose which DocumentCloud.org creds to use
-            shared = False
-            individual = False
-
-            user_change_link = '<a href="/admin/auth/user/{}/change/#documentcloudcredentials-0" target="_blank">here</a>.'.format(user.id)
-
-            if not obj.created:
-                if password_exists:
-                    individual = True
-                    obj.account = 'yours'
-                else:
-                    shared = True
-                    obj.account = 'shared'
-            else:
-                if obj.account == 'shared' and password_exists:
-                    shared = True
-                elif obj.account == 'yours' and not password_exists:
-                    message = format_html('You need to re-enter your DocumentCloud password ' + user_change_link)
-                    messages.error(request, message)
-                else:
-                    individual = True
-
-            ## set the DocumentCloud.org client
-            if individual:
-                email = email_address
-                password_encrypted = documentcloud_password
-                password = decryption(password_encrypted)
-            elif shared:
-                email = DC_USERNAME
-                password = DC_PASSWORD
-            else:
-                message = format_html('No DocumentCloud credentials found for an individual account for you or a shared account for your organization. Please add your individual credentials to your user profile {} and contact an administrator about adding shared account credentials.'.format(user_change_link))
-                messages.error(request, message)
-
-            try:
-                client = connection(email, password)
-
-                ## determine whether to create or update
-                if obj.documentcloud_id:
-                    obj.document_update(client)
-                else:
-                    obj.document_upload(client)
-            except:
-                message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password ' + user_change_link)
-                messages.error(request, message)
         except:
             message = str(sys.exc_info())
+            messages.error(request, message)
+
+        ## DocumentCloud credential vars
+        doccloud_creds = DocumentCloudCredentials.objects.filter(user=user)[0]
+        verified = doccloud_creds.verified
+
+        ## assign the password if creds verified
+        if verified:
+            doccloud_password = doccloud_creds.password
+        else:
+            doccloud_password = None
+
+        ## choose which DocumentCloud.org creds to use
+        shared = False
+        individual = False
+
+        user_change_link = '<a href="/admin/auth/user/{}/change/#documentcloudcredentials-0" target="_blank">here</a>.'.format(user.id)
+
+        if not obj.created:
+            if verified:
+                individual = True
+                obj.account = 'yours'
+            else:
+                shared = True
+                obj.account = 'shared'
+        else:
+            if obj.account == 'shared' and verified:
+                shared = True
+            elif obj.account == 'yours' and not verified:
+                message = format_html('You need to re-enter your DocumentCloud password ' + user_change_link)
+                messages.error(request, message)
+            else:
+                individual = True
+
+        ## set the DocumentCloud.org client
+        if individual:
+            email = email_address
+            password_encrypted = doccloud_password
+            password = decryption(password_encrypted)
+        elif shared:
+            email = DC_USERNAME
+            password = DC_PASSWORD
+        else:
+            message = format_html('No DocumentCloud credentials found for an individual account for you or a shared account for your organization. Please add your individual credentials to your user profile {} and contact an administrator about adding shared account credentials.'.format(user_change_link))
+            messages.error(request, message)
+
+        try:
+            client = connection(email, password)
+
+            ## determine whether to create or update
+            if obj.documentcloud_id:
+                obj.document_update(client)
+            else:
+                obj.document_upload(client)
+        except:
+            message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password ' + user_change_link)
             messages.error(request, message)
 
         ## generate the embed
