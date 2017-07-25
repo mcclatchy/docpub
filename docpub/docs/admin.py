@@ -230,7 +230,7 @@ class UserAdmin(BaseUserAdmin):
         except:
             message = str(sys.exc_info())
             messages.error(request, message)
-            slackbot('ERROR: User admin\n' + obj + '\n' + message)
+            slackbot('ERROR: User admin\n' + obj.get_username() + '\n' + message)
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 
