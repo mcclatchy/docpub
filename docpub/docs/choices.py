@@ -49,8 +49,8 @@ NEWSROOM_CHOICES = (
 )
 
 UPLOADER_ACCOUNT_CHOICES = (
-    ('shared', 'Shared account'),
-    ('yours', 'Your account'),
+    ('shared', 'Shared DocumentCloud account'),
+    ('yours', 'Your DocumentCloud account'),
 )
 
 # NEWSROOM_DOMAIN_MAPPING = {
