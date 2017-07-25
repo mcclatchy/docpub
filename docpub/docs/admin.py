@@ -15,12 +15,21 @@ from docs.slackbot import slackbot
 
 class DocumentAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {
-            'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'user', 'newsroom', 'embed_code', 'copy_embed_code', 'documentcloud_url_formatted') #'project', 'copy_embed_code',
+        ('Key details'.upper(), {
+            'fields': ('access', 'title', ('file', 'link',), 'description', 'source',) #'project', 'copy_embed_code',
         }),
+        ('Embed code + live link'.upper(), {
+            'fields': ('embed_code', 'copy_embed_code', 'documentcloud_url_formatted',)
+        }),
+        ('About this document'.upper(), {
+            'fields': ('user', 'account', 'newsroom',) #'project', 'copy_embed_code',
+        }),
+        # (None, {
+        #     'fields': ('access', 'title', ('file', 'link',), 'description', 'source', 'user', 'account', 'newsroom', 'embed_code', 'copy_embed_code', 'documentcloud_url_formatted') #'project', 'copy_embed_code',
+        # }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('secure', 'sidebar', 'related_article', 'account',)
+            'fields': ('secure', 'sidebar', 'related_article',)
         })
     )
     # fields = ('access', 'title', ('file', 'link',), 'description', 'source', 'project', 'embed_code', 'documentcloud_url_formatted') # 'format_embed_code', 'documentcloud_id', 
