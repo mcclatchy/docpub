@@ -228,10 +228,9 @@ class UserAdmin(BaseUserAdmin):
                 message = 'Please add your DocumentCloud password at the bottom of your user profile. This will allow you to upload documents to your account instead of the default shared account.'
                 messages.error(request, message)
         except:
-            user = obj.user
             message = str(sys.exc_info())
             messages.error(request, message)
-            slackbot('ERROR: User admin\n' + user + '\n' + message)
+            slackbot('ERROR: User admin\n' + obj + '\n' + message)
         super(UserAdmin, self).save_model(request, obj, form, change)
 
 
