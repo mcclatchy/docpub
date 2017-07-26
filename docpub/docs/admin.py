@@ -96,9 +96,9 @@ class DocumentAdmin(admin.ModelAdmin):
 
             if not obj.newsroom:
                 if email_address:
-                    obj.newsroom = email_split[1]
+                    newsroom = email_split[1]
                 else:
-                    obj.newsroom = '{} (unspecified)'.format(COMPANY)
+                    newsroom = '{} (unspecified)'.format(COMPANY)
         except:
             message = str(sys.exc_info())
             messages.error(request, message)
