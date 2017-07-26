@@ -92,13 +92,25 @@ class Document(BasicInfo):
 
     def data_dict(self):
         """ add key-value pairs to document on DocumentCloud """
+        ## newsroom
         newsrooms = dict(NEWSROOM_CHOICES)
         try:
             newsroom = newsrooms[self.newsroom]
         except:
             newsroom = '{} (unspecified)'.format(COMPANY)
+        ## user
+        user = self.user.get_username()
+        ## worth having option of getting full name? but then it would be inconsistent if updated later
+        # user = self.user
+        # username = user.get_full_name()
+        # if username:
+        #     user = username
+        # else:
+        #     user = self.user.get_username()
+        ## construct the dict
         return {
             'newsroom': newsroom,
+            'uploaded_by': user,
         }
 
     def document_update(self, client):
