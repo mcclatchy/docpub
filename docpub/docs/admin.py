@@ -48,7 +48,10 @@ class DocumentAdmin(admin.ModelAdmin):
     def documentcloud_url_formatted(self, obj):
         """ display the DocumentCloud URL as a clickable link in the admin"""
         if obj.documentcloud_id:
-            link = format_html('<a class="button" href="{}" target="_blank">View/edit on DocumentCloud</a>'.format(obj.documentcloud_url))
+            message = ''
+            if obj.account == 'shared':
+                message = '<p style="margin-top:10px;"><strong>NOTE:</strong> Because this was uploaded to the shared account, you will not be able to edit it. Also, it will not be visible to you if it is not set to "Public" access.</p>'
+            link = format_html('<a class="button" href="{}" target="_blank">View/edit on DocumentCloud</a>{}'.format(obj.documentcloud_url, message))
         elif obj.file or obj.link:
             link = 'Click "Save" again on this document.' # , or make sure your DocumentCloud credentials are entered and correct
         else:
@@ -94,7 +97,7 @@ class DocumentAdmin(admin.ModelAdmin):
                 if email_address:
                     obj.newsroom = email_split[1]
                 else:
-                    obj.newsroom = '%s (unspecified)' % (COMPANY)
+                    obj.newsroom = '{} (unspecified)'.format(COMPANY)
         except:
             message = str(sys.exc_info())
             messages.error(request, message)
@@ -115,6 +118,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
         user_change_link = '<a href="/admin/auth/user/{}/change/#documentcloudcredentials-0" target="_blank">here</a>.'.format(user.id)
 
+        ## if it's a new document
         if not obj.created:
             if verified:
                 individual = True
@@ -122,13 +126,14 @@ class DocumentAdmin(admin.ModelAdmin):
             else:
                 shared = True
                 obj.account = 'shared'
-        else:
-            if obj.account == 'shared' and verified:
+        ## if it's an existing document
+        elif obj.created:
+            if obj.account == 'shared':
                 shared = True
             elif obj.account == 'yours' and not verified:
                 message = format_html('You need to re-enter your DocumentCloud password ' + user_change_link)
                 messages.error(request, message)
-            else:
+            elif obj.account == 'yours':
                 individual = True
 
         ## set the DocumentCloud.org client
