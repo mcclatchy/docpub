@@ -94,7 +94,7 @@ class DocumentAdmin(admin.ModelAdmin):
             email_split = email_address.split('@')
             newsroom = obj.newsroom
 
-            if not obj.newsroom:
+            if not newsroom:
                 if email_address:
                     newsroom = email_split[1]
                 else:
