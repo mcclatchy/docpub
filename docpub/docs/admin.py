@@ -11,6 +11,7 @@ from docs.choices import NEWSROOM_CHOICES
 from docs.decryption import decryption
 from docs.forms import PasswordInline
 from docs.slackbot import slackbot
+from urllib.error import HTTPError
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -156,8 +157,19 @@ class DocumentAdmin(admin.ModelAdmin):
                 obj.document_update(client)
             else:
                 obj.document_upload(client)
-        except:
+        except HTTPError:
             message = format_html('Your DocumentCloud credentials have failed. Please make sure your DocPub email matches your DocumentCloud email and that you have entered the correct DocumentCloud password ' + user_change_link)
+            messages.error(request, message)
+        except FileNotFoundError:
+            message = format_html('File not found. Please confirm:<br><br> \
+                    - you are uploading the correct file<br> \
+                    - your PDF is unlocked<br> \
+                    - your PDF opens as expected in your browser or Acrobat<br><br> \
+                If this issue persists, please contact your administrator.')
+            messages.error(request, message)
+        except:
+            message = str(sys.exc_info())
+            slackbot(user, message)
             messages.error(request, message)
 
         ## generate the embed
