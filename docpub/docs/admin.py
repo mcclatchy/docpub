@@ -239,8 +239,13 @@ class UserAdmin(BaseUserAdmin):
         except:
             message = 'Please add your DocumentCloud password at the bottom of your user profile. This will allow you to upload documents to your account instead of the default shared account.'
             messages.error(request, message)
+        encrypted = ''
+        try:
+            encrypted = obj.documentcloudcredentials.encrypted
+        except:
+            pass
         ## confirm password is correct
-        if password and password[-1] != '=':
+        if password and not encrypted:
             client = connection(email, password)
             try:
                 ## upload a test doc

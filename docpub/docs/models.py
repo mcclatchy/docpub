@@ -182,6 +182,7 @@ class Document(BasicInfo):
 
 class DocumentCloudCredentials(BasicInfo):
     # email = models.EmailField(max_length=254, help_text='Email address for user in DocPub must be the same as DocumentCloud email address.')
+    encrypted = models.BooleanField(blank=True, default=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     newsroom = models.CharField(max_length=255, null=True, blank=True, choices=NEWSROOM_CHOICES)
     password = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud password')
@@ -191,6 +192,7 @@ class DocumentCloudCredentials(BasicInfo):
         password_raw = self.password
         if password_raw and len(password_raw) > 1:
             self.password = CONVERT.encrypt(password_raw.encode())
+            self.encrypted = True
         return super(DocumentCloudCredentials, self).save(*args, **kwargs)
 
     class Meta:
