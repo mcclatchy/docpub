@@ -13,12 +13,6 @@
 
 * TK: if email domain not whitelisted, update oauth process to redirect to a page that says `Thanks for registering! Your account has been sent to an administrator for approval`
 
-* TK: how to mark an account as `verified` after the test has occurred? currently only updates that field during the test upload
-
-* TK: make the condtl under `save_model` for `UserAdmin` bulletproof; currently it would not work properly if a user's DocumentCloud password included an = at the end, like the encrypted passwords all do
-	* e.g. starts with `gAAA` or ???
-	* better solution? add a field indicating password status (empty, unsecure, secure); e.g. empty is when it's `''` or `None`, unsecure 1) is when it was empty and is now not or 2) the last one doesn't match the current one before encrypting
-
 # Questions
 
 * Q: require everyone to have their own DocCloud.org account to use the tool? 
@@ -105,6 +99,8 @@
 * COMPLETED: how to handle non-Mclatchy whitelisted email domains? (e.g. gmail)
 	* Solution: try/except statement
 
+* COMPLETED: how to mark an account as `verified` after the test has occurred? currently only updates that field during the test upload
+
 * COMPLETED: add a custom formatted `list_display` field that displays a checkmark or x depending on whether the user has included a verified DocumentCloud password
 	* need to add a `verified` field under DocCloudCreds
 
@@ -120,11 +116,15 @@
 * COMPLETED: fix 403 error when when signing in with Google oauth
 	* `accounts/login` not found in URLs, but not an issue when logging with existing user
 
-* COMPLETE: fix `user` if uploaded to shared? Ben C uploaded one with shared account and it showed him as the owner, not shared account as owner
+* COMPLETED: fix `user` if uploaded to shared? Ben C uploaded one with shared account and it showed him as the owner, not shared account as owner
 
 * N/A: Ben C got `documentcloud_login` referenced before assignment, which he shouldn't get bc doc uploaded to the shared acct; must be related to fact that it thinks it was uploaded to individual instead of shared acct
 
-* COMPLETE: if uploaded to shared account, give warning that user won't be able to view if access set to `Your newsroom` and don't have the shared account credentials (maybe don't say the second part tho)
+* COMPLETED: if uploaded to shared account, give warning that user won't be able to view if access set to `Your newsroom` and don't have the shared account credentials (maybe don't say the second part tho)
 
-* COMPLETE: add boolean field to doccloud creds to indicate whether encrypted (default is False)
+* COMPLETED: add boolean field to doccloud creds to indicate whether encrypted (default is False)
+
+* COMPLETED: make the conditional under `save_model` for `UserAdmin` bulletproof; currently it would not work properly if a user's DocumentCloud password included an = at the end, like the encrypted passwords all do
+	* e.g. starts with `gAAA` or ???
+	* better solution? add a field indicating password status (empty, unsecure, secure); e.g. empty is when it's `''` or `None`, unsecure 1) is when it was empty and is now not or 2) the last one doesn't match the current one before encrypting
 
