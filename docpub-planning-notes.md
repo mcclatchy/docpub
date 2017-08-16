@@ -1,5 +1,8 @@
 # To-do list
 
+* TK: Is there a good solution for populating a user's newsroom field in `DocumentCloudCredentials` when no password is present?
+	* we would need a new model (`UserInfo`? `UserMeta`), but would it have any info beyond `newsroom`?
+
 * TK: re-enable adding username to doccloud k-v pair metadata
 
 * TK: ability to include newsroom even if there's no password
