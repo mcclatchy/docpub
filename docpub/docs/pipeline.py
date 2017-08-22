@@ -8,8 +8,12 @@ from docs.slackbot import slackbot
 def apply_permissions(backend, user, response, *args, **kwargs):
     ## if the user hasn't logged in before
     if not user.last_login:
-        ## get the group
-        group = Group.objects.get(name__contains='documents')
+        ## get the add/edit/delete group
+        group = Group.objects.get(name__contains='add/edit/delete documents')
+        ## add the user to that group
+        group.user_set.add(user)
+        ## get the edit user group
+        group = Group.objects.get(name__contains='edit user')
         ## add the user to that group
         group.user_set.add(user)
         ## set the user as staff
