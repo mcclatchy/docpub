@@ -225,7 +225,7 @@ class UserAdmin(BaseUserAdmin):
         if request.user.is_superuser:
             return qs
         else:
-            return qs.filter(user=request.user)
+            return qs#.filter(email=request.user.email)
 
     def save_model(self, request, obj, form, change):
         if obj.email:
