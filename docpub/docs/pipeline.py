@@ -9,11 +9,11 @@ def apply_permissions(backend, user, response, *args, **kwargs):
     ## if the user hasn't logged in before
     if not user.last_login:
         ## get the add/edit/delete group
-        group = Group.objects.get(name__contains='add/edit/delete documents')
+        group = Group.objects.get(name='Add/edit/delete documents')
         ## add the user to that group
         group.user_set.add(user)
         ## get the edit user group
-        group = Group.objects.get(name__contains='edit user')
+        group = Group.objects.get(name='Edit user')
         ## add the user to that group
         group.user_set.add(user)
         ## set the user as staff
