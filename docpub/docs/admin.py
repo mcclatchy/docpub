@@ -219,13 +219,13 @@ class UserAdmin(BaseUserAdmin):
             return None
     newsroom_name.short_description = 'Newsroom'
 
-    # def get_queryset(self, request):
-    #     """ only show the current user's fellow newsroom users """
-    #     qs = super(DocumentAdmin, self).get_queryset(request)
-    #     if request.user.is_superuser:
-    #         return qs
-    #     else:
-    #         return qs.filter(newsroom=request.user.documentcloudcredentials.newsroom)
+    def get_queryset(self, request):
+        """ only show the current user's User object """
+        qs = super(UserAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=request.user)
 
     def save_model(self, request, obj, form, change):
         if obj.email:
