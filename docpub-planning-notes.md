@@ -1,5 +1,10 @@
 # To-do list
 
+* TK: Issues from Stuart upload
+	* newsroom not auto-set 
+		* it was not this: bc it wasn't set at User level, so I need to remove that as the source and just pull from list)
+	* doc set to public but went to doccloud as private
+
 * TK: Is there a good solution for populating a user's newsroom field in `DocumentCloudCredentials` when no password is present?
 	* we would need a new model (`UserInfo`? `UserMeta`), but would it have any info beyond `newsroom`?
 
@@ -131,3 +136,6 @@
 	* e.g. starts with `gAAA` or ???
 	* better solution? add a field indicating password status (empty, unsecure, secure); e.g. empty is when it's `''` or `None`, unsecure 1) is when it was empty and is now not or 2) the last one doesn't match the current one before encrypting
 
+* COMPLETED: user queryset not limited to user
+
+* COMPLETED: link needs close tag for newsgate
