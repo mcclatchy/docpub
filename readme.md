@@ -27,9 +27,9 @@ Clone the repo
 
 ## Virtualenv/virtualenvwrapper
 
-Create an environment
+Create an environment with the path to your local Python3
 
-	mkvirtualenv docpub
+	mkvirtualenv --python=<your_path_to_python3> docpub
 
 ## Bash alias
 
