@@ -172,7 +172,7 @@ class Document(BasicInfo):
         """ generate the embed code """
         doc_id = self.documentcloud_id
         doc_sidebar = str(self.sidebar).lower()
-        style_embed = '<link rel="stylesheet" type="text/css" href="{css}">'.format(css=EMBED_CSS)
+        style_embed = '<link rel="stylesheet" type="text/css" href="{css}"></link>'.format(css=EMBED_CSS)
         iframe_embed = '<div><iframe class="docpubEmbed" src="https://www.documentcloud.org/documents/{id}.html?sidebar={sidebar}"></iframe></div>'.format(
                 id=doc_id,
                 sidebar=doc_sidebar
