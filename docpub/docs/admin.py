@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
+from django.utils.translation import gettext as _
 from django.contrib import messages
 import sys
 from docpub.settings import COMPANY, DC_USERNAME, DC_PASSWORD, DOCPUBENV, TEST_PDF
@@ -191,7 +192,7 @@ class UserInline(admin.StackedInline):
     # verbose_name_plural = 'Login'
 
 
-class UserAdmin(BaseUserAdmin):
+class DocUserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'newsroom_name', 'is_verified', 'is_superuser', 'is_staff')
     list_filter = ('is_staff', 'is_superuser', 'is_active',)
     inlines = (UserInline,)
@@ -213,9 +214,43 @@ class UserAdmin(BaseUserAdmin):
             return None
     newsroom_name.short_description = 'Newsroom'
 
+    staff_fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        # No permissions
+        # (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        # (_('Groups'), {'fields': ('groups',)}),
+    )
+
+    def change_view(self, request, *args, **kwargs):
+        # for non-superuser
+        if not request.user.is_superuser:
+            try:
+                self.fieldsets = self.staff_fieldsets
+                response = super(DocUserAdmin, self).change_view(request, *args, **kwargs)
+            finally:
+                # Reset fieldsets to its original value
+                self.fieldsets = DocUserAdmin.fieldsets
+            return response
+        else:
+            return super(DocUserAdmin, self).change_view(request, *args, **kwargs)
+
+    # normaluser_fields = ['field1','field2']
+    # superuser_fields = ['special_field1','special_field2']
+
+    # def get_form(self, request, obj=None, **kwargs):
+    #     # self.exclude = []
+    #     # if not request.user.is_superuser:
+    #     #     self.exclude.append('Permissions') #here!
+    #     if request.user.is_superuser:
+    #         self.fields = self.normaluser_fields + self.superuser_fields
+    #     else:
+    #         self.fields = self.normaluser_fields
+    #     return super(UserAdmin, self).get_form(request, obj, **kwargs)
+
     def get_queryset(self, request):
         """ only show the current user's User object """
-        qs = super(UserAdmin, self).get_queryset(request)
+        qs = super(DocUserAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         else:
@@ -252,7 +287,7 @@ class UserAdmin(BaseUserAdmin):
             except:
                 message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
                 messages.error(request, message)
-        super(UserAdmin, self).save_model(request, obj, form, change)
+        super(DocUserAdmin, self).save_model(request, obj, form, change)
 
 
 class DocumentSetInline(admin.StackedInline):
@@ -284,7 +319,7 @@ class DocumentSetAdmin(admin.ModelAdmin):
 
 admin.site.register(Document, DocumentAdmin)
 admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(User, DocUserAdmin)
 admin.site.register(DocumentSet, DocumentSetAdmin)
 # admin.site.register(DocumentCloudCredentials, DocumentCloudCredentialsAdmin)
 
