@@ -128,6 +128,8 @@ class Document(BasicInfo):
                 pdf = self.link
             elif self.file:
                 pdf = self.file
+        else:
+            pdf = ''
 
         kwargs = {
             'title': self.title,
