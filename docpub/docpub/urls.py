@@ -33,5 +33,5 @@ if DOCPUBENV != 'prod':
 admin.site.site_header = 'DocPub {}'.format(env)
 
 ## disable the 'View site' in the admin header
-admin.site.site_url = None
+# admin.site.site_url = None
 
