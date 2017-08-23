@@ -88,17 +88,11 @@ class DocumentAdmin(admin.ModelAdmin):
         if not obj.created:
             obj.user = user
 
-        ## populate newsroom
+        ## populate newsroom field
         try:
-            fullname = user.get_full_name()
             email_split = email_address.split('@')
-            newsroom = obj.newsroom
-
-            if not newsroom:
-                if email_address:
-                    newsroom = email_split[1]
-                else:
-                    newsroom = '{} (unspecified)'.format(COMPANY)
+            if not obj.newsroom and email_address:
+                obj.newsroom = email_split[1]
         except:
             message = str(sys.exc_info())
             messages.error(request, message)
@@ -168,8 +162,8 @@ class DocumentAdmin(admin.ModelAdmin):
                 If this issue persists, please contact your administrator.')
             messages.error(request, message)
         except:
-            message = str(sys.exc_info())
-            slackbot(user, message)
+            message = str(user) + ': ' + str(sys.exc_info())
+            slackbot(message)
             messages.error(request, message)
 
         ## generate the embed
