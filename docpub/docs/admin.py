@@ -217,7 +217,6 @@ class DocUserAdmin(BaseUserAdmin):
     staff_fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-        # No permissions
         # (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
         # (_('Groups'), {'fields': ('groups',)}),
     )
@@ -229,24 +228,11 @@ class DocUserAdmin(BaseUserAdmin):
                 self.fieldsets = self.staff_fieldsets
                 response = super(DocUserAdmin, self).change_view(request, *args, **kwargs)
             finally:
-                # Reset fieldsets to its original value
+                # reset fieldsets to its original value
                 self.fieldsets = DocUserAdmin.fieldsets
             return response
         else:
             return super(DocUserAdmin, self).change_view(request, *args, **kwargs)
-
-    # normaluser_fields = ['field1','field2']
-    # superuser_fields = ['special_field1','special_field2']
-
-    # def get_form(self, request, obj=None, **kwargs):
-    #     # self.exclude = []
-    #     # if not request.user.is_superuser:
-    #     #     self.exclude.append('Permissions') #here!
-    #     if request.user.is_superuser:
-    #         self.fields = self.normaluser_fields + self.superuser_fields
-    #     else:
-    #         self.fields = self.normaluser_fields
-    #     return super(UserAdmin, self).get_form(request, obj, **kwargs)
 
     def get_queryset(self, request):
         """ only show the current user's User object """
