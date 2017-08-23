@@ -142,3 +142,6 @@
 
 * COMPLETED: hide permissions and other fieldsets a non-superuser shouldn't have access to in the `DocUserAdmin`
 	* https://stackoverflow.com/questions/2297377/how-do-i-prevent-permission-escalation-in-django-admin-when-granting-user-chang
+
+* shortcut link to your user profile in header
+
