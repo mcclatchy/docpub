@@ -1,8 +1,6 @@
 # To-do list
 
 * TK: Issues from Stuart upload
-	* newsroom not auto-set 
-		* it was not this: bc it wasn't set at User level, so I need to remove that as the source and just pull from list)
 	* doc set to public but went to doccloud as private
 
 * TK: Is there a good solution for populating a user's newsroom field in `DocumentCloudCredentials` when no password is present?
@@ -139,3 +137,8 @@
 * COMPLETED: user queryset not limited to user
 
 * COMPLETED: link needs close tag for newsgate
+
+* FIXED: newsroom not auto-setting anymore 
+
+* COMPLETED: hide permissions and other fieldsets a non-superuser shouldn't have access to in the `DocUserAdmin`
+	* https://stackoverflow.com/questions/2297377/how-do-i-prevent-permission-escalation-in-django-admin-when-granting-user-chang
