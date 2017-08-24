@@ -1,21 +1,7 @@
 # To-do list
 
-* TK: Issues from Stuart upload
-	* doc set to public but went to doccloud as private
-
-* TK: Is there a good solution for populating a user's newsroom field in `DocumentCloudCredentials` when no password is present?
+* TK: ability to populate a user's newsroom field in `DocumentCloudCredentials` when no password is present
 	* we would need a new model (`UserInfo`? `UserMeta`), but would it have any info beyond `newsroom`?
-
-* TK: re-enable adding username to doccloud k-v pair metadata
-
-* TK: ability to include newsroom even if there's no password
-
-* TK: welcome email template with account information
-
-* TK: send emails
-	* `new_user` to superadmin after user signs up
-	* `confirmation` to user after they get perms
-	* `welcome` to new user after superadmin adds them
 
 * TK: if email domain not whitelisted, update oauth process to redirect to a page that says `Thanks for registering! Your account has been sent to an administrator for approval`
 
@@ -23,15 +9,21 @@
 
 * Q: require everyone to have their own DocCloud.org account to use the tool? 
 
+* Q: send emails? 
+	* `new_user` to superadmin after user signs up (currently just using slack)
+	* `welcome` to new user after superadmin adds them
+
 * Q: set a shared account in the admin so indidivual newsrooms can do their own shared accounts vs just using DC bureau's?
 
 * Q: filter admin by newsroom or individual? currently individual
 
-* Q: email me when finished?
+* Q: email user when finished?
 
 * Q: schedule publish?
 
 * Q: delete PDF after uploaded to avoid excess storage costs?
+
+* Q: re-enable adding user full name to doccloud k-v pair metadata?
 
 # Punt
 
@@ -143,5 +135,6 @@
 * COMPLETED: hide permissions and other fieldsets a non-superuser shouldn't have access to in the `DocUserAdmin`
 	* https://stackoverflow.com/questions/2297377/how-do-i-prevent-permission-escalation-in-django-admin-when-granting-user-chang
 
-* shortcut link to your user profile in header
+* COMPLETED: shortcut link to your user profile in header
 
+* UNABLE TO REPLICATE: doc set to public but went to doccloud as private when Stuart L uploaded something
