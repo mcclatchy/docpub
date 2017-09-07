@@ -100,8 +100,11 @@ class DocumentAdmin(admin.ModelAdmin):
             messages.error(request, message)
 
         ## DocumentCloud credential vars
-        doccloud_creds = DocumentCloudCredentials.objects.filter(user=user)[0]
-        verified = doccloud_creds.verified
+        try:
+            doccloud_creds = DocumentCloudCredentials.objects.filter(user=user)[0]
+            verified = doccloud_creds.verified
+        except:
+            verified = False
 
         ## assign the password if creds verified
         if verified:
