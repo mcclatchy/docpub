@@ -36,6 +36,7 @@ class DocumentAdmin(admin.ModelAdmin):
     list_filter = ('access',) # 'project', 'updated', 'created',
     readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user',) # 'documentcloud_id'
     actions = ('generate_embed_codes')
+    save_on_top = True
 
     def copy_embed_code(self, obj):
         """ create a button in the admin for users to copy a specific embed code """
