@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
 from django.contrib import messages
-import sys
+import sys #, traceback
 from docpub.settings import COMPANY, DC_USERNAME, DC_PASSWORD, DOCPUBENV, TEST_PDF
 from .models import Document, DocumentCloudCredentials, DocumentSet
 from docs.connection import connection
@@ -134,20 +134,26 @@ class DocumentAdmin(admin.ModelAdmin):
                 individual = True
 
         ## set the DocumentCloud.org client
-        if individual:
+        if individual and doccloud_password and not shared:
             email = email_address
             password_encrypted = doccloud_password
-            password = decryption(password_encrypted)
-        elif shared:
+        else:
             email = DC_USERNAME
             password = DC_PASSWORD
-        else:
-            message = format_html('No DocumentCloud credentials found for an individual account for you or a shared account for your organization. Please add your individual credentials to your user profile {} and contact an administrator about adding shared account credentials.'.format(user_change_link))
-            messages.error(request, message)
+        # else:
+            # message = '!!! No shared account information found. Please add to private settings file or disable this option.'
+            # slackbot(message)
+            # message = format_html('No DocumentCloud credentials found for an individual account for you or a shared account for your organization. Please add your individual credentials to your user profile {} and contact an administrator about adding shared account credentials.'.format(user_change_link))
+            # message = 'Your administrator has not added a shared account login for DocPub. Please contact them to add one or disable this option.'
+            # messages.error(request, message)
 
         try:
-            client = connection(email, password)
-
+            if email and password:
+                client = connection(email, password)
+        except:
+            message = str(user) + ': ' + str(sys.exc_info())
+            slackbot(message)
+        try:
             ## determine whether to create or update
             if obj.documentcloud_id:
                 obj.document_update(client)
@@ -166,7 +172,9 @@ class DocumentAdmin(admin.ModelAdmin):
         except:
             message = str(user) + ': ' + str(sys.exc_info())
             slackbot(message)
-            messages.error(request, message)
+            # message = traceback.print_exc()
+            # slackbot(message)
+            # messages.error(request, message)
 
         ## generate the embed
         try:
@@ -187,7 +195,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
 class UserInline(admin.StackedInline):
     model = DocumentCloudCredentials
-    readonly_fields = ('newsroom',)
+    readonly_fields = ('newsroom', 'verified', 'encrypted')
     form = PasswordInline
     # can_delete = False
     # verbose_name_plural = 'Login'
@@ -244,6 +252,7 @@ class DocUserAdmin(BaseUserAdmin):
             return qs.filter(email=request.user.email)
 
     def save_model(self, request, obj, form, change):
+        message_no_pw = 'Please add your DocumentCloud password at the bottom of your user profile. This will allow you to upload documents to your account instead of the default shared account.'
         if obj.email:
             email = obj.email
             # set the newsroom 
@@ -253,8 +262,7 @@ class DocUserAdmin(BaseUserAdmin):
         try:
             password = obj.documentcloudcredentials.password
         except:
-            message = 'Please add your DocumentCloud password at the bottom of your user profile. This will allow you to upload documents to your account instead of the default shared account.'
-            messages.error(request, message)
+            messages.error(request, message_no_pw)
         encrypted = ''
         try:
             encrypted = obj.documentcloudcredentials.encrypted
@@ -274,6 +282,8 @@ class DocUserAdmin(BaseUserAdmin):
             except:
                 message = 'Your DocumentCloud credentials have failed. Please make sure your DocumentCloud password (not your DocPub password) matches your account. Also, make sure your DocPub email matches your DocumentCloud account email.'
                 messages.error(request, message)
+        elif not password:
+            messages.error(request, message_no_pw)
         super(DocUserAdmin, self).save_model(request, obj, form, change)
 
 
