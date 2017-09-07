@@ -1,5 +1,8 @@
 # To-do list
 
+* TK: purge process for deleting PDFs from S3 after uploaded to document cloud
+	* then have DocPub file fields then point to the PDF on DocumentCloud.org?
+
 * TK: ability to populate a user's newsroom field in `DocumentCloudCredentials` when no password is present
 	* we would need a new model (`UserInfo`? `UserMeta`), but would it have any info beyond `newsroom`?
 
