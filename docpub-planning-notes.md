@@ -1,10 +1,17 @@
 # To-do list
 
+* TK: fix the fact that if you initially entered an incorrect DocCloud password and then update it to correct, the `verified` boolean persists as `False`
+	* this is bc the logic is mostly in `DocumentCloudCredentials` save method
+	* do we need a new field for `password_previous` and then compare new to old to determine if changed?
+
 * TK: purge process for deleting PDFs from S3 after uploaded to document cloud
 	* then have DocPub file fields then point to the PDF on DocumentCloud.org?
 
 * TK: ability to populate a user's newsroom field in `DocumentCloudCredentials` when no password is present
 	* we would need a new model (`UserInfo`? `UserMeta`), but would it have any info beyond `newsroom`?
+
+* TK: after everyone automatically gets a newsroom, change queryset in admin so a newsroom see other docs
+	* but as read-only if not their individual docs?
 
 * TK: if email domain not whitelisted, update oauth process to redirect to a page that says `Thanks for registering! Your account has been sent to an administrator for approval`
 
@@ -16,13 +23,14 @@
 	* `new_user` to superadmin after user signs up (currently just using slack)
 	* `welcome` to new user after superadmin adds them
 
+* Q: schedule publish? 
+	* not possible through the API
+
 * Q: set a shared account in the admin so indidivual newsrooms can do their own shared accounts vs just using DC bureau's?
 
 * Q: filter admin by newsroom or individual? currently individual
 
 * Q: email user when finished?
-
-* Q: schedule publish?
 
 * Q: delete PDF after uploaded to avoid excess storage costs?
 
@@ -141,3 +149,10 @@
 * COMPLETED: shortcut link to your user profile in header
 
 * UNABLE TO REPLICATE: doc set to public but went to doccloud as private when Stuart L uploaded something
+
+* COMPLETED: fix error when adding a document to an account w/o doccloud creds; it would error bc of logic issues
+
+* FIXED: upload issue due to logic updates
+	* password decryption step was accidentally deleted in previous commit
+
+
