@@ -140,6 +140,7 @@ class DocumentAdmin(admin.ModelAdmin):
         if individual and doccloud_password and not shared:
             email = email_address
             password_encrypted = doccloud_password
+            password = decryption(password_encrypted)
         else:
             email = DC_USERNAME
             password = DC_PASSWORD
@@ -151,12 +152,8 @@ class DocumentAdmin(admin.ModelAdmin):
             # messages.error(request, message)
 
         try:
-            if email and password:
-                client = connection(email, password)
-        except:
-            message = str(user) + ': ' + str(sys.exc_info())
-            slackbot(message)
-        try:
+            ## create a client for connecting to DocumentCloud
+            client = connection(email, password)
             ## determine whether to create or update
             if obj.documentcloud_id:
                 obj.document_update(client)
