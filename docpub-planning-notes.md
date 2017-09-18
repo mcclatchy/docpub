@@ -1,17 +1,17 @@
 # To-do list
 
+* TK: purge process for deleting PDFs from S3 after uploaded to document cloud
+	* then have DocPub file fields then point to the PDF on DocumentCloud.org?
+
+* TK: after everyone automatically gets a newsroom, change queryset in admin so a newsroom see other docs
+	* but as read-only if not their individual docs?
+
 * TK: fix the fact that if you initially entered an incorrect DocCloud password and then update it to correct, the `verified` boolean persists as `False`
 	* this is bc the logic is mostly in `DocumentCloudCredentials` save method
 	* do we need a new field for `password_previous` and then compare new to old to determine if changed?
 
-* TK: purge process for deleting PDFs from S3 after uploaded to document cloud
-	* then have DocPub file fields then point to the PDF on DocumentCloud.org?
-
 * TK: ability to populate a user's newsroom field in `DocumentCloudCredentials` when no password is present
 	* we would need a new model (`UserInfo`? `UserMeta`), but would it have any info beyond `newsroom`?
-
-* TK: after everyone automatically gets a newsroom, change queryset in admin so a newsroom see other docs
-	* but as read-only if not their individual docs?
 
 * TK: if email domain not whitelisted, update oauth process to redirect to a page that says `Thanks for registering! Your account has been sent to an administrator for approval`
 
