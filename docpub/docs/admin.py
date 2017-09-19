@@ -140,7 +140,14 @@ class DocumentAdmin(admin.ModelAdmin):
         if individual and doccloud_password and not shared:
             email = email_address
             password_encrypted = doccloud_password
-            password = decryption(password_encrypted)
+            try:
+                password = decryption(password_encrypted)
+            # except InvalidToken:
+            except:
+                message = format_html('Your DocumentCloud password was not able to be decrypted correctly. Your administrator has been notified.')
+                messages.error(request, message)
+                message = str(user) + ': ' + str(sys.exc_info())
+                slackbot(message)
         else:
             email = DC_USERNAME
             password = DC_PASSWORD
