@@ -1,5 +1,7 @@
 # To-do list
 
+* TEST: switching `settings_private` from mccdocpub to mccdata on test server
+
 * TK: purge process for deleting PDFs from S3 after uploaded to document cloud
 	* then have DocPub file fields then point to the PDF on DocumentCloud.org?
 
@@ -155,4 +157,4 @@
 * FIXED: upload issue due to logic updates
 	* password decryption step was accidentally deleted in previous commit
 
-
+* COMPLETED: Add a link to copy PDF only and copy document viewer URL
