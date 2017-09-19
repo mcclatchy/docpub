@@ -73,21 +73,13 @@ class Document(BasicInfo):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
+    # def save(self, *args, **kwargs):
         # if self.updated:
         #     self.document_update()
         # else:
         #     self.document_upload()
         ## abstract to get_doc_id() function or function with a while loop?
-        try:
-            obj = documentcloud_object(self, client)
-            self.documentcloud_pdf_url = obj.pdf_url
-            ## grab the text unless messy text is selected
-            # if not self.messy_text:
-            #     self.text = obj.full_text
-        except:
-            pass
-        return super(Document, self).save(*args, **kwargs)
+        # return super(Document, self).save(*args, **kwargs)
         ## if we're going to use delete_file(self), include here and then do another return super to save?
 
     def data_dict(self):
@@ -144,6 +136,7 @@ class Document(BasicInfo):
         obj = client.documents.upload(pdf, **kwargs)
         self.documentcloud_id = obj.id
         self.documentcloud_url = obj.canonical_url
+        self.documentcloud_pdf_url = obj.pdf_url
 
     def documentcloud_object(self, client):
         """ retrieve a specific document object on DocumentCloud """
