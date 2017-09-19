@@ -51,7 +51,10 @@ class DocumentAdmin(admin.ModelAdmin):
     def copy_pdf_link(self, obj):
         """ create a button in the admin for users to copy a link to the PDF hosted by DocumentCloud """
         if obj.documentcloud_id:
-            pdf = obj.documentcloud_pdf_url
+            if obj.documentcloud_pdf_url:
+                pdf = obj.documentcloud_pdf_url
+            else:
+                pdf = obj.documentcloud_url.replace('.html', '.pdf')
             html = '<a class=\'button copyCode\' data-clipboard-action=\'copy\' data-clipboard-text=\'{code}\' href=\'#\' onclick=\'copy(); return false;\'>Copy URL to PDF</a>'.format(code=pdf)
             button = format_html(html)
         else:
