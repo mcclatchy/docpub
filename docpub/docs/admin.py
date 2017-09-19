@@ -63,9 +63,18 @@ class DocumentAdmin(admin.ModelAdmin):
         """ display the DocumentCloud URL as a clickable link in the admin"""
         if obj.documentcloud_id:
             message = ''
+            spaces = '&nbsp;' * 5
             if obj.account == 'shared':
                 message = '<p style="margin-top:10px;"><strong>NOTE:</strong> Because this was uploaded to the shared account, you will not be able to edit it. Also, it will not be visible to you if it is not set to "Public" access.</p>'
-            link = format_html('<a class="button" href="{}" target="_blank">View/edit on DocumentCloud</a>{}'.format(obj.documentcloud_url, message))
+            link = format_html('\
+                <a class="button" href="{url}" target="_blank">View/edit on DocumentCloud</a>\
+                {spaces}\
+                <a class=\'button copyCode\' data-clipboard-action=\'copy\' data-clipboard-text=\'{url}\' href=\'#\' onclick=\'copy(); return false;\'>Copy URL to DocumentCloud</a>\
+                {message}'.format(
+                    url=obj.documentcloud_url,
+                    spaces=spaces,
+                    message=message)
+                )
         elif obj.file or obj.link:
             link = 'Click "Save" again on this document.' # , or make sure your DocumentCloud credentials are entered and correct
         else:
