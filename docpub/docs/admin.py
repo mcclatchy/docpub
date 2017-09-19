@@ -21,7 +21,7 @@ class DocumentAdmin(admin.ModelAdmin):
             'fields': ('access', 'title', ('file', 'link',), 'description', 'source',) #'project', 'copy_embed_code',
         }),
         ('Embed code + live link'.upper(), {
-            'fields': ('embed_code', 'copy_embed_code', 'documentcloud_url_formatted',)
+            'fields': ('embed_code', 'copy_embed_code', 'documentcloud_url_formatted', 'copy_pdf_link')
         }),
         ('About this document'.upper(), {
             'fields': ('user', 'account', 'newsroom',) #'project', 'copy_embed_code',
@@ -34,7 +34,7 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = ('title', 'created', 'access', 'copy_embed_code',) # , 'documentcloud_url_formatted', 'source'
     list_editable = ('access',)
     list_filter = ('access',) # 'project', 'updated', 'created',
-    readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user',) # 'documentcloud_id'
+    readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user', 'copy_pdf_link') # 'documentcloud_id'
     actions = ('generate_embed_codes')
     save_on_top = True
 
@@ -47,6 +47,17 @@ class DocumentAdmin(admin.ModelAdmin):
         else:
             button = '-'
         return button
+
+    def copy_pdf_link(self, obj):
+        """ create a button in the admin for users to copy a link to the PDF hosted by DocumentCloud """
+        if obj.documentcloud_id:
+            pdf = obj.documentcloud_pdf_url
+            html = '<a class=\'button copyCode\' data-clipboard-action=\'copy\' data-clipboard-text=\'{code}\' href=\'#\' onclick=\'copy(); return false;\'>Copy URL to PDF</a>'.format(code=pdf)
+            button = format_html(html)
+        else:
+            button = '-'
+        return button
+    copy_pdf_link.short_description = 'Copy PDF link'
 
     def documentcloud_url_formatted(self, obj):
         """ display the DocumentCloud URL as a clickable link in the admin"""
