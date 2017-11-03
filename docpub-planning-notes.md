@@ -1,4 +1,14 @@
+
+# Misc
+
+* TypeError (for ???)
+* HTTPError (for wrong credentials)
+* FileNotFoundError (for PDF)
+
 # To-do list
+
+* TK: Fabric3 deployment script
+	* https://github.com/mathiasertl/fabric/
 
 * IN PROGRESS: write tests for DocPub
 	* create functions in the app for the things I want to test and then just invoke those vs. re-creating basic functionality
