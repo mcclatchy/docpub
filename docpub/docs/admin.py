@@ -33,7 +33,8 @@ class DocumentAdmin(admin.ModelAdmin):
     )
     list_display = ('title', 'created', 'access', 'copy_embed_code',) # , 'documentcloud_url_formatted', 'source'
     list_editable = ('access',)
-    list_filter = ('access',) # 'project', 'updated', 'created',
+    list_filter = ('access', 'updated', 'created') # 'project', 'updated', 'created',
+    search_fields = ('title', 'user__username')
     readonly_fields = ('account', 'copy_embed_code', 'documentcloud_url_formatted', 'embed_code', 'user', 'copy_pdf_link') # 'documentcloud_id'
     actions = ('generate_embed_codes')
     save_on_top = True
