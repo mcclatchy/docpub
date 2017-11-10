@@ -1,6 +1,9 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import User
-from docpub.settings import COMPANY, CONVERT, EMBED_CSS, UPLOAD_PATH
+import os
+from docpub.settings import COMPANY, CONVERT, EMBED_CSS, UPLOAD_PATH, DOMAIN
 from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES, UPLOADER_ACCOUNT_CHOICES
 from s3direct.fields import S3DirectField
 
@@ -14,10 +17,6 @@ def build_project_list(client):
         project_tuple = (project.title, project.title)
         projects_list.append(project_tuple)
     return projects_list
-
-def delete_file(self):
-    """ delete PDF on file system """
-    os.remove(self.file.path)
 
 
 ##### MODELS #####
@@ -50,8 +49,8 @@ class Document(BasicInfo):
     # documentcloud_thumbnail = models.URLField(max_length=255, blank=True, null=True, verbose_name='Document thumbail', help_text='Pulled from DocumentCloud after document finishes processing.')
     documentcloud_url = models.CharField(max_length=255, null=True, blank=True, verbose_name='DocumentCloud URL', help_text='URL of the document on DocumentCloud')
     embed_code = models.TextField(null=True, blank=True) # , help_text='Copy the full piece of code above.'
-    file = S3DirectField(dest='mccdata', blank=True, null=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...')
-    # file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to=UPLOAD_PATH) ## date: (upload_to='uploads/%Y/%m/%d/') ## this path works for uploading, but not when click in admin afterward
+    # file = S3DirectField(dest='mccdata', blank=True, null=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...')
+    file = models.FileField(blank=True, verbose_name='Upload PDF', help_text='Choose the PDF you want to upload or...', upload_to=UPLOAD_PATH) ## date: (upload_to='uploads/%Y/%m/%d/') ## this path works for uploading, but not when click in admin afterward
     link = models.URLField(max_length=255, null=True, blank=True, verbose_name='Link to PDF', help_text='...paste the URL of a PDF you would like to upload. \
         <br><strong>*** NOTES ***</strong><br> \
         - You can only use one PDF option (upload or link)<br> \
@@ -173,6 +172,18 @@ class Document(BasicInfo):
                 sidebar=doc_sidebar
             ) # style="border:none;width:100%;height:500px" # desktop height 930px, mobile height 500px
         self.embed_code = style_embed + iframe_embed
+
+
+@receiver(post_save, sender=Document)
+def delete_file(sender, instance, **kwargs):
+    if instance.file:
+        try:
+            file = DOMAIN + str(instance.file)
+            os.remove(file)
+            instance.file = None
+            instance.save()
+        except:
+            pass
 
 
 class DocumentCloudCredentials(BasicInfo):
