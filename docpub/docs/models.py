@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 import os
 from docpub.settings import COMPANY, CONVERT, EMBED_CSS, UPLOAD_PATH, DOMAIN
 from docs.choices import ACCESS_CHOICES, NEWSROOM_CHOICES, UPLOADER_ACCOUNT_CHOICES
-from s3direct.fields import S3DirectField
+# from s3direct.fields import S3DirectField
 
 
 ##### GENERAL FUNCTIONS #####
