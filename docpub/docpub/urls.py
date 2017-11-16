@@ -6,8 +6,11 @@ from docs.views import index
 
 
 urlpatterns = [
+    ## import any URL pattens defined in /docpub/docs/urls.py
     url(r'^docs/', include('docs.urls')),
+    ## admin URLs
     url(r'^admin/', admin.site.urls),
+    ## admin login for social auth or Django credentials
     url(r'^accounts/login/$', auth_views.LoginView.as_view()),
     ## social auth
     url(r'^$', index, name='index'),
@@ -15,10 +18,10 @@ urlpatterns = [
     url('', include('social_django.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),
     ## django-s3direct
-    url(r'^s3direct/', include('s3direct.urls')),
+    # url(r'^s3direct/', include('s3direct.urls')),
 ]
 
-## if Django is in debug mode...
+## if Django is in debug mode, then include toolbar URLs
 if DEBUG:
     import debug_toolbar
     urlpatterns = [
