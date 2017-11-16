@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext as _
 from django.contrib import messages
 import sys #, traceback
+from urllib.error import HTTPError
 from docpub.settings import COMPANY, DC_USERNAME, DC_PASSWORD, DOCPUBENV, TEST_PDF
 from .models import Document, DocumentCloudCredentials, DocumentSet
 from docs.connection import connection
@@ -12,7 +13,6 @@ from docs.choices import NEWSROOM_CHOICES
 from docs.decryption import decryption
 from docs.forms import PasswordInline
 from docs.slackbot import slackbot
-from urllib.error import HTTPError
 
 
 class DocumentAdmin(admin.ModelAdmin):
